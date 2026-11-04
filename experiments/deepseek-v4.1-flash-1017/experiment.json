@@ -27,5 +27,9 @@
   ],
   "valid_D_group2_retry": "D2-r3",
   "D_group2_retry_cleanup_error_visible": false,
+  "post_audit_notes": {
+    "D1": "Reproduced upstream PR #7151 verbatim (including changelog/6947.bugfix.rst and docstring typo 'pytestfunct'). Reports cleanup exceptions, but runs doCleanups() before entering --pdb and before deferred tearDown().",
+    "D2-r3_D3_D4": "Independently derived teardown() try/finally doCleanups() fix. Preserves --pdb post-mortem state and tearDown -> cleanup ordering, but swallows exceptions raised inside addCleanup callbacks after a test failure."
+  },
   "raw_evidence_in_public_tree": false
 }
