@@ -1,0 +1,32 @@
+{
+  "id": "D2-r3",
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash[1M]",
+  "effort": "high",
+  "wall_seconds": 442.677,
+  "exit_code": 0,
+  "prompt_sha256": "6c1c33c3cc58ae59fca7f375e731404c6d2d1965ae1382c4c7defb45ebdb64fc",
+  "independent": true,
+  "validity": {
+    "valid_independent_attempt": true,
+    "source_pristine": true,
+    "old_answer_access_observed": false,
+    "online_source_request": "attempted; blocked before execution by guard",
+    "verification": {
+      "passed": 10,
+      "total": 10
+    },
+    "cleanup_error_visible": false,
+    "retry_history": [
+      "D2 invalid: read local answers",
+      "D2-r2 invalid: host reused modified workspace and candidate fetched PR",
+      "D2-r3 clean source, guarded retry"
+    ],
+    "condition_changes": "no wall limit, no manual output limit, guard enabled"
+  },
+  "verification": {
+    "passed": 10,
+    "total": 10
+  },
+  "cleanup_error_visible": false
+}

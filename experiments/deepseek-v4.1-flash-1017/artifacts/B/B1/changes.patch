@@ -1,0 +1,87 @@
+--- a/HISTORY.rst
++++ b/HISTORY.rst
+@@ -13,6 +13,11 @@
+   or not it actually did).
+ - The ``timeout`` parameter now affects requests with both ``stream=True`` and
+   ``stream=False`` equally.
++
++**Bugfixes**
++
++- Preserve method changes made during a redirect for subsequent hops. A 307
++  following a 303 no longer restores the original POST method.
+ 
+ 2.2.1 (2014-01-23)
+ ++++++++++++++++++
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -179,6 +179,11 @@
+             )
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
++
++            # The next redirect must be resolved against the request that was
++            # actually sent, otherwise method/body changes made above are lost
++            # (e.g. POST -> 303 -> GET -> 307 must stay GET).
++            req = prepared_request
+ 
+             i += 1
+             yield resp
+--- a/test_requests.py
++++ b/test_requests.py
+@@ -7,7 +7,13 @@
+ import json
+ import os
+ import pickle
++import threading
+ import unittest
++
++try:
++    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
++except ImportError:
++    from http.server import BaseHTTPRequestHandler, HTTPServer
+ 
+ import requests
+ import pytest
+@@ -121,6 +127,42 @@
+     # def test_HTTP_302_ALLOW_REDIRECT_POST(self):
+     #     r = requests.post(httpbin('status', '302'), data={'some': 'data'})
+     #     self.assertEqual(r.status_code, 200)
++
++    def test_HTTP_303_THEN_307_KEEPS_GET(self):
++        """A 307 after a 303 must not restore the method the 303 replaced."""
++        seen = []
++        statuses = [303, 307, 200]
++
++        class Handler(BaseHTTPRequestHandler):
++            def handle_request(self):
++                seen.append(self.command)
++                idx = len(seen) - 1
++                self.send_response(statuses[idx])
++                if idx + 1 < len(statuses):
++                    self.send_header('Location', '/next')
++                self.send_header('Content-Length', '0')
++                self.end_headers()
++
++            do_GET = do_POST = handle_request
++
++            def log_message(self, *args):
++                pass
++
++        server = HTTPServer(('127.0.0.1', 0), Handler)
++        thread = threading.Thread(target=server.serve_forever)
++        thread.daemon = True
++        thread.start()
++        try:
++            s = requests.session()
++            s.trust_env = False
++            s.post('http://127.0.0.1:%s/' % server.server_port,
++                   data='hello', timeout=3)
++        finally:
++            server.shutdown()
++            server.server_close()
++            thread.join()
++
++        assert seen == ['POST', 'GET', 'GET']
+ 
+     def test_HTTP_200_OK_GET_WITH_PARAMS(self):
+         heads = {'User-agent': 'Mozilla/5.0'}

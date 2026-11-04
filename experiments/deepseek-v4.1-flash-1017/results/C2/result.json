@@ -1,0 +1,18 @@
+{
+  "id": "C2",
+  "client": "claude_code",
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash[1M]",
+  "effort": "high",
+  "wall_seconds": 46.742,
+  "exit_code": 0,
+  "exit_reason": "process_exit",
+  "prompt_sha256": "2352e2dc948274409b51c96904adef91d3136782db982091d23b1204a6920d41",
+  "independent": true,
+  "invalid_reason": null,
+  "verification": {
+    "passed": 41,
+    "total": 41,
+    "all_passed": true
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "D1",
+  "client": null,
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash",
+  "effort": "high",
+  "wall_seconds": 332.297,
+  "exit_code": 0,
+  "exit_reason": "process_exit",
+  "prompt_sha256": "6c1c33c3cc58ae59fca7f375e731404c6d2d1965ae1382c4c7defb45ebdb64fc",
+  "independent": true,
+  "invalid_reason": null,
+  "verification": {
+    "passed": 10,
+    "total": 10,
+    "all_passed": true
+  },
+  "cleanup_error_diagnostic": {
+    "cleanup_error_visible": true,
+    "original_failure_visible": true
+  }
+}

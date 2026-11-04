@@ -1,0 +1,17 @@
+# Keep credentials, raw sessions and machine-local runtime outside the shared tree.
+.env
+.env.*
+!.env.example
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.pyc
+__pycache__/
+.pytest_cache/
+_private/
+.local/
+raw-logs/
+node_modules/
+.venv/

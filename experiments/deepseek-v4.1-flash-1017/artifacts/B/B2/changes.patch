@@ -1,0 +1,14 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -179,6 +179,11 @@
+             )
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
++
++            # Carry the request we actually sent into the next iteration so
++            # that a method change (e.g. POST -> GET after a 303) is not
++            # undone by a later redirect such as a 307.
++            req = prepared_request
+ 
+             i += 1
+             yield resp

@@ -1,0 +1,29 @@
+--- a/HISTORY.rst
++++ b/HISTORY.rst
+@@ -13,6 +13,12 @@
+   or not it actually did).
+ - The ``timeout`` parameter now affects requests with both ``stream=True`` and
+   ``stream=False`` equally.
++
++**Bugfixes**
++
++- Subsequent redirects now build on the previous hop's request, so a method
++  rewritten by an earlier redirect (e.g. ``POST`` -> ``GET`` after a 303) is
++  no longer reverted by a later 307.
+ 
+ 2.2.1 (2014-01-23)
+ ++++++++++++++++++
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -167,6 +167,11 @@
+             new_auth = get_netrc_auth(url) if self.trust_env else None
+             if new_auth is not None:
+                 prepared_request.prepare_auth(new_auth)
++
++            # Carry the (possibly rewritten) method, headers and body into the
++            # next hop, so later redirects build on this request rather than
++            # on the original one (e.g. 303 -> GET must survive a following 307).
++            req = prepared_request
+ 
+             resp = self.send(
+                 prepared_request,

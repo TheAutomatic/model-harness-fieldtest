@@ -1,0 +1,24 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -121,10 +121,17 @@
+             self._request._fillfixtures()
+ 
+     def teardown(self):
+-        if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
+-        self._testcase = None
+-        self._obj = None
++        try:
++            if self._needs_explicit_tearDown:
++                self._testcase.tearDown()
++        finally:
++            if self._testcase is not None:
++                # If the test failed, TestCase.run() was interrupted before it could
++                # call doCleanups() (see runtest()). Call it here so cleanup
++                # functions registered with addCleanup() are not lost.
++                self._testcase.doCleanups()
++            self._testcase = None
++            self._obj = None
+ 
+     def startTest(self, testcase):
+         pass

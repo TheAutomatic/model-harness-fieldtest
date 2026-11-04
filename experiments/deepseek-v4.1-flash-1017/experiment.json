@@ -1,0 +1,31 @@
+{
+  "title": "DeepSeek V4.1 Flash 1017 — model/provider/harness field test",
+  "model_version": "DeepSeek-V4.1-Flash-1017",
+  "official_alias": "deepseek-flash",
+  "opencode_alias": "deepseek-v4.1-flash",
+  "opencode_exact_snapshot_verified": false,
+  "groups": {
+    "1": "OpenCode Go → OMP",
+    "2": "OpenCode Go → Claude Code",
+    "3": "DeepSeek official → OMP",
+    "4": "DeepSeek official → Claude Code"
+  },
+  "upstream": {
+    "B": {
+      "repo": "psf/requests",
+      "instance_id": "psf__requests-1963",
+      "base_commit": "110048f9837f8441ea536804115e80b69f400277"
+    },
+    "D": {
+      "instance_id": "pytest-dev__pytest-7151",
+      "base_commit": "2b51ed46d54be58da6bbcd28f68149b3fc2cd104"
+    }
+  },
+  "invalid_attempts": [
+    "D2",
+    "D2-r2"
+  ],
+  "valid_D_group2_retry": "D2-r3",
+  "D_group2_retry_cleanup_error_visible": false,
+  "raw_evidence_in_public_tree": false
+}

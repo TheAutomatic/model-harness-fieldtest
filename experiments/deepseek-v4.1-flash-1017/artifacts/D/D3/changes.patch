@@ -1,0 +1,51 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -121,8 +121,16 @@
+             self._request._fillfixtures()
+ 
+     def teardown(self):
+-        if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++        if self._testcase is not None:
++            try:
++                if self._needs_explicit_tearDown:
++                    self._testcase.tearDown()
++            finally:
++                # When the test method fails, we escape unittest's TestCase.run
++                # before it can invoke the registered cleanups, so run them here
++                # (a no-op when unittest already did).  This also must happen if
++                # tearDown() raised.
++                self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -182,6 +182,27 @@
+     assert failed == 0, failed
+     assert passed == 2
+     assert passed + skipped + failed == 2
++
++
++def test_addcleanup_called_on_failure(testdir):
++    testdir.makepyfile(
++        """
++        import unittest
++
++        cleanups = []
++
++        class MyTestCase(unittest.TestCase):
++            def test_1_one(self):
++                self.addCleanup(cleanups.append, "one")
++            def test_2_failing(self):
++                self.addCleanup(cleanups.append, "failing")
++                assert False
++            def test_3_check(self):
++                assert cleanups == ["one", "failing"]
++    """
++    )
++    result = testdir.runpytest()
++    result.assert_outcomes(passed=2, failed=1)
+ 
+ 
+ def test_teardown_issue1649(testdir):

@@ -1,0 +1,21 @@
+{
+  "id": "D2-r2",
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash[1M]",
+  "effort": "high",
+  "wall_seconds": 814.896,
+  "exit_code": 0,
+  "prompt_sha256": "6c1c33c3cc58ae59fca7f375e731404c6d2d1965ae1382c4c7defb45ebdb64fc",
+  "independent": false,
+  "validity": {
+    "valid_independent_attempt": false,
+    "reason": "Host launcher mistakenly loaded official-claude-run.json and reused already modified official D workspace. Candidate additionally fetched upstream PR patch. Excluded from capability comparison.",
+    "responsibility": "Host preparation error; preserved rather than overwrite",
+    "next_attempt": "D2-r3"
+  },
+  "verification": {
+    "passed": 10,
+    "total": 10
+  },
+  "cleanup_error_visible": true
+}

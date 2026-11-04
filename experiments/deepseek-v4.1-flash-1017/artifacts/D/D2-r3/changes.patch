@@ -1,0 +1,78 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,7 +122,13 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++            # `TestCase.run` was interrupted before it could call `tearDown`
++            # and `doCleanups`, so call them now (in the same order as
++            # unittest does).
++            try:
++                self._testcase.tearDown()
++            finally:
++                self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -18,6 +18,58 @@
+     reprec = testdir.inline_run(testpath)
+     assert reprec.matchreport("testpassing").passed
+     assert reprec.matchreport("test_failing").failed
++
++
++def test_unittest_addcleanup_called_on_failure(testdir):
++    """Cleanups registered with addCleanup must run even if the test fails."""
++    testdir.makepyfile(
++        """
++        import unittest
++
++        cleanups = []
++
++        class MyTestCase(unittest.TestCase):
++            def test_a_pass(self):
++                self.addCleanup(cleanups.append, "pass")
++
++            def test_b_fail(self):
++                self.addCleanup(cleanups.append, "fail")
++                assert False
++
++            def test_c_check_cleanups(self):
++                assert cleanups == ["pass", "fail"]
++        """
++    )
++    reprec = testdir.inline_run()
++    reprec.assertoutcome(failed=1, passed=2)
++
++
++def test_unittest_addcleanup_called_when_teardown_fails(testdir):
++    """Cleanups must run after tearDown, even if tearDown raises."""
++    testdir.makepyfile(
++        """
++        import unittest
++
++        events = []
++
++        class MyTestCase(unittest.TestCase):
++            def tearDown(self):
++                events.append("tearDown")
++                if self._testMethodName == "test_a_fail":
++                    raise RuntimeError("tearDown failed")
++
++            def test_a_fail(self):
++                self.addCleanup(events.append, "cleanup")
++                assert False
++
++            def test_b_check_cleanups(self):
++                assert events == ["tearDown", "cleanup"]
++        """
++    )
++    reprec = testdir.inline_run()
++    assert reprec.matchreport("test_a_fail", when="call").failed
++    assert reprec.matchreport("test_a_fail", when="teardown").failed
++    assert reprec.matchreport("test_b_check_cleanups", when="call").passed
+ 
+ 
+ def test_runTest_method(testdir):

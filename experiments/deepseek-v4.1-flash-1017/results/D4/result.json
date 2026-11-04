@@ -1,0 +1,22 @@
+{
+  "id": "D4",
+  "client": "claude_code",
+  "provider": "deepseek_official",
+  "model": "deepseek-flash[1M]",
+  "effort": "high",
+  "wall_seconds": 283.75,
+  "exit_code": 0,
+  "exit_reason": "natural_process_exit",
+  "prompt_sha256": "6c1c33c3cc58ae59fca7f375e731404c6d2d1965ae1382c4c7defb45ebdb64fc",
+  "independent": true,
+  "invalid_reason": null,
+  "verification": {
+    "passed": 10,
+    "total": 10,
+    "all_passed": true
+  },
+  "cleanup_error_diagnostic": {
+    "cleanup_error_visible": false,
+    "original_failure_visible": true
+  }
+}

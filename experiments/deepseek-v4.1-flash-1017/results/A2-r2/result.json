@@ -1,0 +1,13 @@
+{
+  "id": "A2-r2",
+  "client": "claude_code",
+  "provider": "opencode-go",
+  "model": "deepseek-v4.1-flash[1M]",
+  "effort": "high",
+  "wall_seconds": 721.951,
+  "exit_code": 0,
+  "exit_reason": "natural_process_exit",
+  "prompt_sha256": "b7b5898beece0f6298f8cf4db4edc1cebabee1074eabdb4147ac9805c718d66f",
+  "independent": true,
+  "invalid_reason": null
+}

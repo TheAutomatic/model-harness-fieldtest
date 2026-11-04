@@ -1,0 +1,14 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -167,6 +167,11 @@
+             new_auth = get_netrc_auth(url) if self.trust_env else None
+             if new_auth is not None:
+                 prepared_request.prepare_auth(new_auth)
++
++            # The next redirect must build on the request we are about to
++            # send, not on the original one: a 303 (or browser-style 301/302)
++            # may have changed the method to GET and dropped the body.
++            req = prepared_request
+ 
+             resp = self.send(
+                 prepared_request,
