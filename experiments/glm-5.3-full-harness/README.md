@@ -103,3 +103,4 @@
 - 第一轮：[提示词](r1/prompts/) · [交付物与补丁](r1/artifacts/) · [结果、截图与审计](r1/results/) · [验收脚本](r1/evaluation/)
 - 第二轮：[提示词](r2/prompts/) · [交付物与补丁](r2/artifacts/) · [结果、截图与审计](r2/results/) · [验收脚本](r2/evaluation/)
 - 历史对照档（精简六工具）：[../glm-5.3/README.md](../glm-5.3/README.md)
+- 跨档客户端机制与 Token 终评：[../../notes/harness-comparison-full-default.md](../../notes/harness-comparison-full-default.md)

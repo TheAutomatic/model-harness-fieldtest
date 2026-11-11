@@ -11,6 +11,10 @@
 | [GLM-5.3（精简工具）](experiments/glm-5.3/README.md) | 智谱官方 API × OMP / Claude Code | 早期仅开放六个基础工具的两轮记录：B/C 饱和、D 拉出方案光谱；第二轮 Claude 经 pip download 读上游 |
 | [DeepSeek V4.1 Flash 1017](experiments/deepseek-v4.1-flash-1017/README.md) | OpenCode Go / 官方 API × OMP / Claude Code | 2D 鹈鹕骑车、Requests / Pytest 真实修 bug、算法题，以及测试途中踩的几个大坑 |
 
+跨实验客户端（Claude Code vs OMP）的 Token 账单拆解、架构机制对比与选型结论：
+- **[Harness 横向复盘（二）：满血开箱重测后的客户端终评与选型结论](notes/harness-comparison-full-default.md)**（推荐先看）
+- [Harness 横向复盘（一）：精简六工具口径下的早期账单与镜像短板](notes/harness-comparison-minimal-tools.md)
+
 这里的规矩很简单：用平时跟助手说话的方式发指令，不塞一整套评分细则，也不给算法提示。模型自己找文件、改代码、跑测试；交卷之后我们直接打开网页看画面、起服务验逻辑、用对拍和回归套件卡边界。
 
 测试途中踩的坑、超时的半成品、甚至因为目录没隔离好导致模型“偷看”隔壁答案的乌龙，全都原样留着。补测就单开记录，绝不拿最好看的一次偷偷覆盖旧档。
@@ -38,6 +42,7 @@ experiments/<模型版本>/
   reports/        各阶段的详细记录
   evaluation/     独立验收脚本与复现说明
   experiment.json 版本信息、对比矩阵与上游仓库基准 commit
+notes/            跨实验的客户端（Harness）机制、Token 账单与选型复盘
 ```
 
 多轮重跑的实验（如 GLM-5.3、GLM-5.3-Flash）在档内再按 `r1/`、`r2/` 分轮存放 `prompts/`、`artifacts/`、`results/` 与 `evaluation/`，总表 README 与 experiment.json 放在档根。
