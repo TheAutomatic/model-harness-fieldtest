@@ -1,0 +1,94 @@
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -876,6 +876,54 @@
+     reprec.assertoutcome(passed=1, failed=1)
+ 
+ 
++def test_testcase_do_cleanups_when_test_fails(testdir):
++    # PYTEST_DONT_REWRITE: this checkout's assertion rewriter is incompatible
++    # with this Python's AST, which breaks collection of inner test modules.
++    testpath = testdir.makepyfile(
++        '''
++        """PYTEST_DONT_REWRITE"""
++        import unittest
++
++        cleanups = []
++
++        class TestExample(unittest.TestCase):
++            def test_1_pass(self):
++                self.addCleanup(cleanups.append, "passed")
++
++            def test_2_fail(self):
++                self.addCleanup(cleanups.append, "failed")
++                assert False
++
++            def test_3_check(self):
++                assert cleanups == ["passed", "failed"]
++        '''
++    )
++    reprec = testdir.inline_run(testpath)
++    reprec.assertoutcome(passed=2, failed=1)
++
++
++def test_testcase_cleanup_error_is_reported(testdir):
++    testpath = testdir.makepyfile(
++        '''
++        """PYTEST_DONT_REWRITE"""
++        import unittest
++
++        class TestExample(unittest.TestCase):
++            def test_1_fail_with_broken_cleanup(self):
++                self.addCleanup(lambda: 0 / 0)
++                assert False
++        '''
++    )
++    result = testdir.runpytest()
++    result.stdout.fnmatch_lines(
++        [
++            "*ERROR at teardown of*",
++            "*ZeroDivisionError*",
++            "*1 failed*1 error*",
++        ]
++    )
++
++
+ def test_issue333_result_clearing(testdir):
+     testdir.makeconftest(
+         """
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,7 +122,21 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++            # TestCase.run() was interrupted via _GetOutOf_testPartExecutor
++            # (see runtest) before it could run doCleanups(), so run the
++            # cleanups here, after tearDown, like TestCase.run() does.
++            # Errors in cleanup functions are reported via addError, like
++            # unittest does.
++            testcase = self._testcase
++            try:
++                testcase.tearDown()
++            finally:
++                while testcase._cleanups:
++                    function, args, kwargs = testcase._cleanups.pop()
++                    try:
++                        function(*args, **kwargs)
++                    except Exception:
++                        self.addError(testcase, sys.exc_info())
+         self._testcase = None
+         self._obj = None
+ 
+@@ -192,6 +206,11 @@
+     def addSuccess(self, testcase):
+         pass
+ 
++    def addDuration(self, *args, **kwargs):
++        # Python 3.12+ reports test durations through the result object;
++        # pytest tracks durations itself.
++        pass
++
+     def stopTest(self, testcase):
+         pass
+ 

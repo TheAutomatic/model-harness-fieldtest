@@ -1,0 +1,8 @@
+{
+  "id": "A-claude",
+  "client": "claude",
+  "model": "glm-5.3-flash",
+  "wall_seconds": 506.223,
+  "exit_code": 0,
+  "prompt_sha256": "b7b5898beece0f6298f8cf4db4edc1cebabee1074eabdb4147ac9805c718d66f"
+}

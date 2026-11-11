@@ -1,0 +1,13 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "read": 19,
+    "edit": 1,
+    "write": 1,
+    "bash": 3
+  },
+  "source_reference": "No upstream source read was identified in the tool log.",
+  "scope": "Tool log review. The hooks did not provide an OS sandbox."
+}

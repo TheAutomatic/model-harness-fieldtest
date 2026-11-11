@@ -1,0 +1,117 @@
+--- a/check_redirects.py
++++ b/check_redirects.py
+@@ -0,0 +1,99 @@
++"""Offline regression checks for redirect method handling (safe to delete afterwards)."""
++import collections
++import collections.abc
++import sys
++import threading
++from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
++
++# Same compat shim as sitecustomize.py (old requests on modern Python).
++for _name in ('Mapping', 'MutableMapping', 'Callable', 'Iterable'):
++    if not hasattr(collections, _name):
++        setattr(collections, _name, getattr(collections.abc, _name))
++
++sys.path.insert(0, r'<USER_HOME>\AppData\Local\Temp\glm53-yy4x3xkh')
++import requests
++
++# (initial method, redirect statuses per hop, expected method on each hop)
++# Note: requests 2.3.0 does not follow 308 (missing from is_redirect), so no 308 chains here.
++CASES = [
++    ('POST', [303, 307], ['GET', 'GET']),    # the bug that was fixed
++    ('POST', [303, 303], ['GET', 'GET']),
++    ('POST', [303, 307, 307], ['GET', 'GET', 'GET']),
++    ('POST', [307, 307], ['POST', 'POST']),  # 307 must preserve POST and body
++    ('POST', [302], ['GET']),                # browser behaviour: 302 turns POST into GET
++    ('POST', [301], ['GET']),                # browser behaviour: 301 turns POST into GET
++    ('POST', [307], ['POST']),
++    ('GET', [307], ['GET']),
++    ('GET', [303, 307], ['GET', 'GET']),
++    ('HEAD', [303, 307], ['HEAD', 'HEAD']),
++]
++
++seen_methods = []
++seen_bodies = []
++statuses_left = []
++
++
++class Handler(BaseHTTPRequestHandler):
++    def handle_request(self):
++        length = int(self.headers.get('Content-Length', 0))
++        seen_bodies.append(self.rfile.read(length))
++        seen_methods.append(self.command)
++        status = statuses_left.pop(0)
++        self.send_response(status)
++        if status != 200:
++            self.send_header('Location', '/next')
++        self.send_header('Content-Length', '0')
++        self.end_headers()
++
++    do_POST = do_GET = do_HEAD = handle_request
++
++    def log_message(self, *args):
++        pass
++
++
++def main():
++    server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
++    thread = threading.Thread(target=server.serve_forever, daemon=True)
++    thread.start()
++    base = 'http://127.0.0.1:%s/start' % server.server_port
++    failures = []
++    try:
++        for method, statuses, expected in CASES:
++            del seen_methods[:], seen_bodies[:]
++            statuses_left[:] = list(statuses) + [200]
++            expected_full = [method] + expected  # server sees the initial request too
++            with requests.Session() as session:
++                session.trust_env = False
++                resp = session.request(method, base, data=b'hello', timeout=5)
++            problems = []
++            if seen_methods != expected_full:
++                problems.append('methods=%r' % (seen_methods,))
++            if resp.status_code != 200:
++                problems.append('status=%r' % resp.status_code)
++            if len(resp.history) != len(statuses):
++                problems.append('history=%r' % len(resp.history))
++            if method == 'POST' and 307 in statuses:
++                first_307 = statuses.index(307)
++                if expected[first_307] == 'POST' and b'hello' not in seen_bodies:
++                    # Body must survive the 307 hop when the method stays POST.
++                    problems.append('body lost on 307 hop: %r' % (seen_bodies,))
++            if statuses == [303, 307] and seen_bodies[2] != b'':
++                # After the 303 dropped the body, the 307 hop must not resurrect it.
++                problems.append('stale body on 307 hop: %r' % (seen_bodies,))
++            ok = not problems
++            label = '%s via %s -> %s' % (method, statuses, expected)
++            print('%s  %-22s (actual: %s%s)' % (
++                'PASS' if ok else 'FAIL', label, ' -> '.join(seen_methods),
++                '' if ok else '  [' + '; '.join(problems) + ']'))
++            if not ok:
++                failures.append(label)
++    finally:
++        server.shutdown()
++        server.server_close()
++        thread.join(timeout=2)
++    print('\n%d/%d cases passed' % (len(CASES) - len(failures), len(CASES)))
++    return len(failures)
++
++
++if __name__ == '__main__':
++    sys.exit(main())
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -181,6 +181,12 @@
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
+ 
+             i += 1
++
++            # Continue the redirect chain from the request that was just sent,
++            # so a method change (e.g. 303 turning POST into GET) persists and
++            # a later 307/308 repeats that request instead of the original one.
++            req = prepared_request
++
+             yield resp
+ 
+ 

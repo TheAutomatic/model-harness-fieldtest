@@ -1,0 +1,58 @@
+--- a/changelog/7149.bugfix.rst
++++ b/changelog/7149.bugfix.rst
+@@ -0,0 +1,3 @@
++Fix a bug where cleanups registered with ``addCleanup()`` on ``unittest.TestCase`` tests were not run when the test failed, leaving resources (files, sockets, etc.) behind.
++
++Also add the ``addDuration`` method to the internal unittest result shim, so ``unittest.TestCase`` tests no longer emit a ``RuntimeWarning`` (or fail outright when warnings are configured as errors) on Python 3.12+.
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,9 +122,34 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++            # runtest() interrupted TestCase.run() when the test method failed,
++            # which prevents unittest from running tearDown() and doCleanups()
++            # itself -- so run them here, in unittest's order (tearDown first,
++            # then the cleanups in LIFO order). The cleanups must run even if
++            # tearDown() fails.
++            try:
++                self._testcase.tearDown()
++            finally:
++                self._run_cleanups()
+         self._testcase = None
+         self._obj = None
++
++    def _run_cleanups(self):
++        """Run the cleanup functions registered via addCleanup().
++
++        This mirrors unittest's TestCase.doCleanups(), but reports errors
++        through pytest instead of dropping them (unittest's doCleanups()
++        swallows errors into the throwaway _Outcome it creates when it is
++        called after TestCase.run() was interrupted).
++        """
++        while self._testcase._cleanups:
++            function, args, kwargs = self._testcase._cleanups.pop()
++            try:
++                function(*args, **kwargs)
++            except KeyboardInterrupt:
++                raise
++            except BaseException:
++                self._addexcinfo(sys.exc_info())
+ 
+     def startTest(self, testcase):
+         pass
+@@ -192,6 +217,13 @@
+     def addSuccess(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        # noop -- this is only called on Python 3.12+, which calls it on the
++        # result object at the end of TestCase.run(); without it, unittest
++        # emits a RuntimeWarning for the missing method (which fails tests
++        # when warnings are configured as errors).
++        pass
++
+     def stopTest(self, testcase):
+         pass
+ 

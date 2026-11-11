@@ -1,0 +1,13 @@
+{
+  "id": "B-omp",
+  "client": "omp",
+  "model": "glm-5.3-flash",
+  "wall_seconds": 470.671,
+  "exit_code": 0,
+  "prompt_sha256": "e323cf05a525420ea0f5b28f0d4c782d86637834383ee0e7bba44a5115273baa",
+  "verification": {
+    "passed": 7,
+    "total": 7,
+    "all_passed": true
+  }
+}

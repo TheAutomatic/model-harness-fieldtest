@@ -1,0 +1,98 @@
+--- a/test_behavior.py
++++ b/test_behavior.py
+@@ -0,0 +1,71 @@
++"""Behavioral checks: cleanups, tearDown ordering, skips, xfails, errors."""
++import unittest
++
++import pytest
++
++events = []
++
++
++class TestOrdering(unittest.TestCase):
++    def test_fail_runs_teardown_and_cleanups(self):
++        events.append('test')
++        self.addCleanup(events.append, 'cleanup')
++        self.addCleanup(events.append, 'inner-cleanup')
++
++    def tearDown(self):
++        events.append('tearDown')
++
++    @classmethod
++    def tearDownClass(cls):
++        # verify ordering once all tests of this class have run
++        assert events == [
++            'test', 'tearDown', 'inner-cleanup', 'cleanup',
++        ], events
++
++
++class TestSuccessCleanupOnce(unittest.TestCase):
++    def test_pass(self):
++        events.append('pass-test')
++        self.addCleanup(events.append, 'pass-cleanup')
++
++
++class TestSkips(unittest.TestCase):
++    def test_self_skip_test(self):
++        self.addCleanup(events.append, 'selfskip-cleanup')
++        self.skipTest('skipped via skipTest')
++
++    @unittest.skip('decorator skip')
++    def test_decorated_skip(self):
++        pass
++
++    @unittest.skipIf(True, 'skipIf true')
++    def test_skip_if(self):
++        pass
++
++    def test_pytest_skip_inside(self):
++        self.addCleanup(events.append, 'pytestskip-cleanup')
++        pytest.skip('skipped via pytest.skip')
++
++
++class TestExpectedFailure(unittest.TestCase):
++    @unittest.expectedFailure
++    def test_expected_failure(self):
++        self.addCleanup(events.append, 'xfail-cleanup')
++        assert False
++
++
++class TestSetupError(unittest.TestCase):
++    def setUp(self):
++        self.addCleanup(events.append, 'setup-cleanup')
++        raise RuntimeError('setUp exploded')
++
++    def test_never_runs(self):
++        events.append('never')
++
++
++def test_final_event_check():
++    assert sorted(events) == [
++        'cleanup', 'inner-cleanup', 'pass-cleanup', 'pass-test',
++        'pytestskip-cleanup', 'selfskip-cleanup', 'setup-cleanup',
++        'tearDown', 'test', 'xfail-cleanup',
++    ], events
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -123,10 +123,21 @@
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+             self._testcase.tearDown()
++        # unittest's TestCase.run() is aborted via _GetOutOf_testPartExecutor
++        # when the test fails, skipping its own doCleanups() call: run the
++        # pending cleanups here so they execute regardless of the outcome.
++        # On paths where run() completed, _cleanups is already empty and this
++        # is a no-op.
++        self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+     def startTest(self, testcase):
++        pass
++
++    def addDuration(self, testcase, elapsed):
++        # Required by the unittest protocol on Python 3.12+; durations are
++        # tracked by pytest itself, so this is a no-op (#11381).
+         pass
+ 
+     def _addexcinfo(self, rawexcinfo):

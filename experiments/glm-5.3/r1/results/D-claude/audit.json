@@ -1,0 +1,23 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "Read": 9,
+    "Bash": 24,
+    "Grep": 2,
+    "Edit": 3,
+    "Write": 1
+  },
+  "reference_access_flags": [
+    {
+      "name": "Bash",
+      "input": {
+        "command": "ls \"<USER_HOME>\\model-harness-fieldtest\\.local\\glm53\\deps\" 2>/dev/null; ls \"<USER_HOME>\\AppData\\Local\\Temp\\glm53-07c51svd\"",
+        "description": "List deps directory and working directory contents"
+      }
+    }
+  ],
+  "scope": "Tool-log audit; hooks are not an OS sandbox.",
+  "flag_review": "Attempt to list dependency directory blocked by PreToolUse; no content returned. No observed answer access."
+}

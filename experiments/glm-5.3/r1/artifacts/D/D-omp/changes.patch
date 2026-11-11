@@ -1,0 +1,88 @@
+--- a/changelog/7144.bugfix.rst
++++ b/changelog/7144.bugfix.rst
+@@ -0,0 +1,3 @@
++``unittest.TestCase`` tests now execute cleanups registered with ``addCleanup``
++when the test method fails, matching the behavior of the standard ``unittest``
++runner.
+--- a/changelog/7145.bugfix.rst
++++ b/changelog/7145.bugfix.rst
+@@ -0,0 +1,3 @@
++Implement the optional ``TestResult.addDuration`` method for ``unittest``-style
++tests, avoiding a ``RuntimeWarning`` on Python 3.12+ which could turn into an
++error under ``filterwarnings = error``.
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -1146,3 +1146,26 @@
+     testdir.copy_example("unittest/test_unittest_asynctest.py")
+     reprec = testdir.inline_run()
+     reprec.assertoutcome(failed=1, passed=2)
++
++
++def test_add_cleanup_is_executed_for_failing_test(testdir):
++    """Cleanups registered with ``addCleanup`` must be executed when the test
++    method fails: pytest leaves ``TestCase.run`` via an internal exception in
++    that case, skipping unittest's own ``doCleanups`` call."""
++    testpath = testdir.makepyfile(
++        """
++        import unittest
++
++        cleanups = []
++
++        class MyTestCase(unittest.TestCase):
++            def test_1_fail(self):
++                self.addCleanup(cleanups.append, "failed")
++                assert False, "intentional failure"
++
++            def test_2_check(self):
++                assert cleanups == ["failed"]
++    """
++    )
++    reprec = testdir.inline_run(testpath, "--assert=plain")
++    reprec.assertoutcome(failed=1, passed=1)
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -115,14 +115,21 @@
+ 
+     def setup(self):
+         self._needs_explicit_tearDown = False
++        self._needs_explicit_doCleanups = False
+         self._testcase = self.parent.obj(self.name)
+         self._obj = getattr(self._testcase, self.name)
+         if hasattr(self, "_request"):
+             self._request._fillfixtures()
+ 
+     def teardown(self):
+-        if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++        try:
++            if self._needs_explicit_tearDown:
++                self._testcase.tearDown()
++        finally:
++            # run the cleanups even if tearDown raises, mirroring the
++            # ordering of TestCase.run
++            if self._needs_explicit_doCleanups:
++                self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+@@ -192,6 +199,12 @@
+     def addSuccess(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        # Python 3.12+ calls this after each test and emits a RuntimeWarning
++        # for result objects which don't implement it; pytest records test
++        # durations itself, so this is intentionally a no-op.
++        pass
++
+     def stopTest(self, testcase):
+         pass
+ 
+@@ -226,6 +239,7 @@
+                 if expecting_failure:
+                     raise
+                 self._needs_explicit_tearDown = True
++                self._needs_explicit_doCleanups = True
+                 raise _GetOutOf_testPartExecutor(exc)
+ 
+         # let the unittest framework handle async functions

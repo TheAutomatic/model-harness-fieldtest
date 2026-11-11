@@ -1,0 +1,29 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,7 +122,13 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++            # The test method aborted TestCase.run early (see runtest), so tearDown
++            # and cleanups are executed here, in the same order as TestCase.run
++            # would do it. Cleanups must run even if tearDown raises (#5390).
++            try:
++                self._testcase.tearDown()
++            finally:
++                self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+@@ -192,6 +198,11 @@
+     def addSuccess(self, testcase):
+         pass
+ 
++    def addDuration(self, *args, **kwargs):
++        """No-op. python>=3.12 TestCase.run reports the test duration through
++        result.addDuration and warns (a hard error under filterwarnings=error)
++        when the result object lacks it."""
++
+     def stopTest(self, testcase):
+         pass
+ 

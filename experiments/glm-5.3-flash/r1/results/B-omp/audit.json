@@ -1,0 +1,13 @@
+{
+  "response_models": [
+    "glm-5.3-flash"
+  ],
+  "tool_counts": {
+    "read": 6,
+    "grep": 3,
+    "bash": 5,
+    "edit": 2,
+    "write": 1
+  },
+  "external_reference_commands_observed": 0
+}

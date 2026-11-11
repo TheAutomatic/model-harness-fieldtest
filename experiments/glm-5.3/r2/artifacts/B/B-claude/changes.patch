@@ -1,0 +1,14 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -88,6 +88,11 @@
+         i = 0
+ 
+         while resp.is_redirect:
++            # Each hop must continue from the request actually sent for the
++            # previous hop (resp.request), not from the original request.
++            # Otherwise a 307/308 following a 303 (which rewrote the method
++            # to GET) would resurrect the original method and body.
++            req = resp.request
+             prepared_request = req.copy()
+ 
+             resp.content  # Consume socket so it can be released

@@ -1,0 +1,15 @@
+{
+  "response_models": [
+    "glm-5.3-flash"
+  ],
+  "tool_counts": {
+    "glob": 1,
+    "read": 6,
+    "grep": 5,
+    "edit": 4,
+    "bash": 7,
+    "write": 1
+  },
+  "external_reference_commands_observed": 0,
+  "flag_review": "Backgrounded 'pip install -q pytest httpbin' to run repo test suite; cancelled on session exit, no upstream source read."
+}

@@ -1,0 +1,111 @@
+--- a/test_redirects_local.py
++++ b/test_redirects_local.py
+@@ -0,0 +1,91 @@
++"""Offline regression tests for redirect method/body handling (local server)."""
++import sys
++import threading
++from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
++from pathlib import Path
++
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++import requests
++
++# Each test case: (name, initial method+body, per-hop response statuses,
++#                  expected methods seen by server, expected final status)
++CASES = [
++    # The reported bug: 303 rewrites POST->GET, following 307 must keep GET.
++    ('303 then 307',      dict(method='POST', data='hello'), [303, 307, 200], ['POST', 'GET', 'GET'], 200),
++    # 307 on the first hop preserves the POST and its body.
++    ('307 preserves POST', dict(method='POST', data='hello'), [307, 200],     ['POST', 'POST'],       200),
++    # 302/301 rewrite POST->GET (browser-compat behaviour).
++    ('302 POST->GET',     dict(method='POST', data='hello'), [302, 200],      ['POST', 'GET'],        200),
++    ('301 POST->GET',     dict(method='POST', data='hello'), [301, 200],      ['POST', 'GET'],        200),
++    # 303/302 must not rewrite HEAD.
++    ('302 keeps HEAD',    dict(method='HEAD'),               [302, 200],      ['HEAD', 'HEAD'],       200),
++    ('303 keeps HEAD',    dict(method='HEAD'),               [303, 200],      ['HEAD', 'HEAD'],       200),
++    # Plain GET redirects.
++    ('GET 307',           dict(method='GET'),                [307, 200],      ['GET', 'GET'],         200),
++    ('GET 303',           dict(method='GET'),                [303, 200],      ['GET', 'GET'],         200),
++    # Chain: 307 first (keeps POST), then 303 (rewrites to GET).
++    ('307 then 303',      dict(method='POST', data='hello'), [307, 303, 200], ['POST', 'POST', 'GET'], 200),
++    # Chain of rewrites.
++    ('303 then 302',      dict(method='POST', data='hello'), [303, 302, 200], ['POST', 'GET', 'GET'], 200),
++    ('302 then 301',      dict(method='POST', data='hello'), [302, 301, 200], ['POST', 'GET', 'GET'], 200),
++]
++
++seen = []          # (path-prefix, method) per request
++bodies = {}        # path-prefix -> body bytes received
++
++
++class Handler(BaseHTTPRequestHandler):
++    def handle_request(self):
++        length = int(self.headers.get('Content-Length', 0))
++        body = self.rfile.read(length) if length else b''
++        prefix = self.path.split('/')[1]
++        seen.append((prefix, self.command))
++        bodies.setdefault(prefix, []).append(body)
++        n = sum(1 for p, _ in seen if p == prefix)
++        status = CASES[int(prefix[1:])][2][n - 1]
++        self.send_response(status)
++        if status != 200:
++            self.send_header('Location', '/%s/hop%d' % (prefix, n + 1))
++        self.send_header('Content-Length', '0')
++        self.end_headers()
++
++    do_GET = do_POST = do_HEAD = handle_request
++
++    def log_message(self, *args):
++        pass
++
++
++def main():
++    server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
++    threading.Thread(target=server.serve_forever, daemon=True).start()
++    base = 'http://127.0.0.1:%s' % server.server_port
++    failures = 0
++    try:
++        with requests.Session() as s:
++            s.trust_env = False
++            for i, (name, req, statuses, expected, final) in enumerate(CASES):
++                seen.clear()
++                bodies.clear()
++                r = s.request(req['method'], base + '/t%d/start' % i,
++                              data=req.get('data'), timeout=3, allow_redirects=True)
++                methods = [m for _, m in seen]
++                ok = methods == expected and r.status_code == final
++                print('%-18s %-28s -> %s' % (name, '->'.join(expected),
++                                             'PASS' if ok else 'FAIL got %s final=%s' % (methods, r.status_code)))
++                if not ok:
++                    failures += 1
++                if name == '307 preserves POST':
++                    assert bodies['t1'] == [b'hello', b'hello'], 'body not preserved on 307: %r' % bodies['t1']
++                    print('%-18s body preserved on 307 hop: PASS' % '')
++                if name == '303 then 307':
++                    assert bodies['t0'] == [b'hello', b'', b''], 'unexpected bodies: %r' % bodies['t0']
++                    print('%-18s body dropped after 303:    PASS' % '')
++    finally:
++        server.shutdown()
++        server.server_close()
++    print('\n%s' % ('ALL PASS' if failures == 0 else '%d FAILURE(S)' % failures))
++    sys.exit(1 if failures else 0)
++
++
++if __name__ == '__main__':
++    main()
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -179,6 +179,14 @@
+             )
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
++
++            # Carry the (possibly rewritten) request forward, so that a
++            # later redirect transforms the request as it currently stands
++            # rather than resurrecting the original one. For example, a POST
++            # rewritten to GET by a 303 must stay a GET if a 307 follows
++            # (RFC 7231 section 6.4.7: repeat the request that was met with
++            # the 307).
++            req = prepared_request
+ 
+             i += 1
+             yield resp

@@ -1,0 +1,17 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "Glob": 2,
+    "Read": 4,
+    "Grep": 7,
+    "Bash": 12,
+    "Edit": 4,
+    "Write": 2
+  },
+  "source_reference": "Downloaded Requests 2.34.2 for reference. The extraction command was blocked. No later read of the wheel contents was observed.",
+  "scope": "Tool log review. The hooks did not provide an OS sandbox.",
+  "upstream_source_read": false,
+  "external_package_downloaded": true
+}

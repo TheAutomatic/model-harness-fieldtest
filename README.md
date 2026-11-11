@@ -6,6 +6,8 @@
 
 | 实验记录 | 对比组合 | 看点 |
 |---|---|---|
+| [GLM-5.3-Flash](experiments/glm-5.3-flash/README.md) | 智谱官方 API × OMP / Claude Code | 同题两轮重跑：方差大过客户端差异；B 有“只修方法不修根因”的样本，D 两组独立写出 11/11、一组早调清理掉到 7/11 |
+| [GLM-5.3](experiments/glm-5.3/README.md) | 智谱官方 API × OMP / Claude Code | 两轮：B/C 饱和、D 拉出方案光谱；第二轮 Claude 经 pip download 读上游，分数保留、剔除独立比较 |
 | [DeepSeek V4.1 Flash 1017](experiments/deepseek-v4.1-flash-1017/README.md) | OpenCode Go / 官方 API × OMP / Claude Code | 2D 鹈鹕骑车、Requests / Pytest 真实修 bug、算法题，以及测试途中踩的几个大坑 |
 
 这里的规矩很简单：用平时跟助手说话的方式发指令，不塞一整套评分细则，也不给算法提示。模型自己找文件、改代码、跑测试；交卷之后我们直接打开网页看画面、起服务验逻辑、用对拍和回归套件卡边界。
@@ -26,5 +28,7 @@ experiments/<模型版本>/
   evaluation/     独立验收脚本与复现说明
   experiment.json 版本信息、对比矩阵与上游仓库基准 commit
 ```
+
+多轮重跑的实验（如 GLM-5.3、GLM-5.3-Flash）在档内再按 `r1/`、`r2/` 分轮存放 `prompts/`、`artifacts/`、`results/` 与 `evaluation/`，总表 README 与 experiment.json 放在档根。
 
 为了控制仓库体积、保护本地环境隐私，这里只放生成的网页、代码补丁、验收脚本和脱敏摘要；不打包上游完整源码、Python 运行时、依赖库或带本机路径的原始会话日志。Requests 与 Pytest 复现片段保留各自的上游许可证。

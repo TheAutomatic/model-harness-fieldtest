@@ -1,0 +1,14 @@
+<USER_HOME>\AppData\Local\Temp\glm53-yvtyjdk6\requests\sessions.py:409: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<USER_HOME>\AppData\Local\Temp\glm53-yvtyjdk6\requests\sessions.py:419: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<USER_HOME>\AppData\Local\Temp\glm53-yvtyjdk6\requests\sessions.py:429: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<USER_HOME>\AppData\Local\Temp\glm53-yvtyjdk6\requests\sessions.py:440: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<USER_HOME>\AppData\Local\Temp\glm53-yvtyjdk6\requests\sessions.py:450: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<USER_HOME>\AppData\Local\Temp\glm53-yvtyjdk6\requests\sessions.py:460: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<USER_HOME>\AppData\Local\Temp\glm53-yvtyjdk6\requests\sessions.py:469: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.

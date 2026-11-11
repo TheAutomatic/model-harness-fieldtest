@@ -1,0 +1,15 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "Read": 7,
+    "Bash": 44,
+    "Grep": 6,
+    "Edit": 4
+  },
+  "source_reference": "Downloaded and read upstream Pytest source, including lifecycle methods in Pytest 8.3.3 and 7.1.3. The artifact was scored, but the attempt is excluded from the independent-solution comparison.",
+  "scope": "Tool log review. The hooks did not provide an OS sandbox.",
+  "upstream_source_read": true,
+  "external_package_downloaded": true
+}

@@ -1,0 +1,15 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -179,6 +179,12 @@
+             )
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
++
++            # Subsequent redirects must chain from the request actually sent
++            # above, so that a method rewritten by an earlier hop (e.g. POST
++            # downgraded to GET by a 303) is preserved by a following
++            # 307/308, which must not change the method or body again.
++            req = prepared_request
+ 
+             i += 1
+             yield resp

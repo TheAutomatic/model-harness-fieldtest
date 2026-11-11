@@ -1,0 +1,14 @@
+{
+  "response_models": [
+    "glm-5.3-flash"
+  ],
+  "tool_counts": {
+    "Bash": 11,
+    "Read": 4,
+    "Grep": 5,
+    "Edit": 7,
+    "Write": 3
+  },
+  "external_reference_commands_observed": 1,
+  "flag_review": "curl probe to PyPI blocked by PreToolUse hook; no external content returned."
+}

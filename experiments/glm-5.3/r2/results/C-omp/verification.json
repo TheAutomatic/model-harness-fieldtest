@@ -1,0 +1,331 @@
+{
+  "task": "C",
+  "workspace": "<USER_HOME>\\AppData\\Local\\Temp\\glm53-7itwgz9j",
+  "passed": 39,
+  "total": 41,
+  "all_passed": false,
+  "checks": [
+    {
+      "case": "sample1",
+      "pass": true,
+      "seconds": 0.085,
+      "expected": 10,
+      "actual": "10",
+      "error": null
+    },
+    {
+      "case": "sample2",
+      "pass": true,
+      "seconds": 0.064,
+      "expected": 2736,
+      "actual": "2736",
+      "error": null
+    },
+    {
+      "case": "single_zero",
+      "pass": true,
+      "seconds": 0.066,
+      "expected": 0,
+      "actual": "0",
+      "error": null
+    },
+    {
+      "case": "single_large",
+      "pass": true,
+      "seconds": 0.068,
+      "expected": 5000,
+      "actual": "5000",
+      "error": null
+    },
+    {
+      "case": "equal_prefixes",
+      "pass": true,
+      "seconds": 0.064,
+      "expected": 0,
+      "actual": "0",
+      "error": null
+    },
+    {
+      "case": "wraparound",
+      "pass": true,
+      "seconds": 0.067,
+      "expected": 58,
+      "actual": "58",
+      "error": null
+    },
+    {
+      "case": "no_outer_mod",
+      "pass": true,
+      "seconds": 0.064,
+      "expected": 4960,
+      "actual": "4960",
+      "error": null
+    },
+    {
+      "case": "small_00",
+      "pass": true,
+      "seconds": 0.065,
+      "expected": 1649,
+      "actual": "1649",
+      "error": null
+    },
+    {
+      "case": "small_01",
+      "pass": true,
+      "seconds": 0.065,
+      "expected": 1856,
+      "actual": "1856",
+      "error": null
+    },
+    {
+      "case": "small_02",
+      "pass": true,
+      "seconds": 0.066,
+      "expected": 1311,
+      "actual": "1311",
+      "error": null
+    },
+    {
+      "case": "small_03",
+      "pass": true,
+      "seconds": 0.075,
+      "expected": 225,
+      "actual": "225",
+      "error": null
+    },
+    {
+      "case": "small_04",
+      "pass": true,
+      "seconds": 0.069,
+      "expected": 384,
+      "actual": "384",
+      "error": null
+    },
+    {
+      "case": "small_05",
+      "pass": true,
+      "seconds": 0.069,
+      "expected": 598,
+      "actual": "598",
+      "error": null
+    },
+    {
+      "case": "small_06",
+      "pass": true,
+      "seconds": 0.067,
+      "expected": 959,
+      "actual": "959",
+      "error": null
+    },
+    {
+      "case": "small_07",
+      "pass": true,
+      "seconds": 0.065,
+      "expected": 182,
+      "actual": "182",
+      "error": null
+    },
+    {
+      "case": "small_08",
+      "pass": true,
+      "seconds": 0.063,
+      "expected": 1925,
+      "actual": "1925",
+      "error": null
+    },
+    {
+      "case": "small_09",
+      "pass": true,
+      "seconds": 0.064,
+      "expected": 212,
+      "actual": "212",
+      "error": null
+    },
+    {
+      "case": "small_10",
+      "pass": true,
+      "seconds": 0.067,
+      "expected": 786,
+      "actual": "786",
+      "error": null
+    },
+    {
+      "case": "small_11",
+      "pass": true,
+      "seconds": 0.071,
+      "expected": 216,
+      "actual": "216",
+      "error": null
+    },
+    {
+      "case": "small_12",
+      "pass": true,
+      "seconds": 0.077,
+      "expected": 515,
+      "actual": "515",
+      "error": null
+    },
+    {
+      "case": "small_13",
+      "pass": true,
+      "seconds": 0.071,
+      "expected": 1246,
+      "actual": "1246",
+      "error": null
+    },
+    {
+      "case": "small_14",
+      "pass": true,
+      "seconds": 0.073,
+      "expected": 118,
+      "actual": "118",
+      "error": null
+    },
+    {
+      "case": "small_15",
+      "pass": true,
+      "seconds": 0.073,
+      "expected": 0,
+      "actual": "0",
+      "error": null
+    },
+    {
+      "case": "small_16",
+      "pass": true,
+      "seconds": 0.069,
+      "expected": 22,
+      "actual": "22",
+      "error": null
+    },
+    {
+      "case": "small_17",
+      "pass": true,
+      "seconds": 0.076,
+      "expected": 655,
+      "actual": "655",
+      "error": null
+    },
+    {
+      "case": "small_18",
+      "pass": true,
+      "seconds": 0.07,
+      "expected": 739,
+      "actual": "739",
+      "error": null
+    },
+    {
+      "case": "small_19",
+      "pass": true,
+      "seconds": 0.074,
+      "expected": 0,
+      "actual": "0",
+      "error": null
+    },
+    {
+      "case": "small_20",
+      "pass": true,
+      "seconds": 0.07,
+      "expected": 405,
+      "actual": "405",
+      "error": null
+    },
+    {
+      "case": "small_21",
+      "pass": true,
+      "seconds": 0.067,
+      "expected": 825,
+      "actual": "825",
+      "error": null
+    },
+    {
+      "case": "small_22",
+      "pass": true,
+      "seconds": 0.064,
+      "expected": 14,
+      "actual": "14",
+      "error": null
+    },
+    {
+      "case": "small_23",
+      "pass": true,
+      "seconds": 0.067,
+      "expected": 40,
+      "actual": "40",
+      "error": null
+    },
+    {
+      "case": "small_24",
+      "pass": true,
+      "seconds": 0.077,
+      "expected": 72,
+      "actual": "72",
+      "error": null
+    },
+    {
+      "case": "small_25",
+      "pass": true,
+      "seconds": 0.069,
+      "expected": 210,
+      "actual": "210",
+      "error": null
+    },
+    {
+      "case": "small_26",
+      "pass": true,
+      "seconds": 0.064,
+      "expected": 486,
+      "actual": "486",
+      "error": null
+    },
+    {
+      "case": "small_27",
+      "pass": true,
+      "seconds": 0.067,
+      "expected": 30,
+      "actual": "30",
+      "error": null
+    },
+    {
+      "case": "small_28",
+      "pass": true,
+      "seconds": 0.066,
+      "expected": 640,
+      "actual": "640",
+      "error": null
+    },
+    {
+      "case": "small_29",
+      "pass": true,
+      "seconds": 0.068,
+      "expected": 99,
+      "actual": "99",
+      "error": null
+    },
+    {
+      "case": "small_30",
+      "pass": true,
+      "seconds": 0.066,
+      "expected": 288,
+      "actual": "288",
+      "error": null
+    },
+    {
+      "case": "small_31",
+      "pass": true,
+      "seconds": 0.068,
+      "expected": 3340,
+      "actual": "3340",
+      "error": null
+    },
+    {
+      "case": "max_ones",
+      "pass": false,
+      "error": "15 second timeout"
+    },
+    {
+      "case": "max_large_values",
+      "pass": false,
+      "error": "15 second timeout"
+    }
+  ]
+}

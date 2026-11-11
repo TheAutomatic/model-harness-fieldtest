@@ -1,0 +1,10 @@
+{
+  "response_models": [
+    "glm-5.3-flash"
+  ],
+  "tool_counts": {
+    "write": 1,
+    "edit": 3
+  },
+  "external_reference_commands_observed": 0
+}

@@ -1,0 +1,30 @@
+--- a/HISTORY.rst
++++ b/HISTORY.rst
+@@ -5,6 +5,13 @@
+ 
+ 2.3.0 (YYYY-MM-DD)
+ ++++++++++++++++++
++
++**Bugfixes**
++
++- Redirects now base each hop on the request as last sent. A POST that a
++  303/301/302 turned into GET no longer reverts to POST when a subsequent
++  hop returns a 307, and an ``Authorization`` header stays stripped once it
++  has been removed for a cross-host redirect.
+ 
+ **API Changes**
+ 
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -179,6 +179,11 @@
+             )
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
++
++            # Base subsequent redirections on the request as last sent, so a
++            # method change (e.g. 303 turning POST into GET) persists across
++            # hops instead of reverting to the original method on a 307/308.
++            req = prepared_request
+ 
+             i += 1
+             yield resp

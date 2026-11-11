@@ -1,0 +1,27 @@
+{
+  "model": "glm-5.3-flash",
+  "endpoint": "https://open.bigmodel.cn/api/anthropic",
+  "protocol": "anthropic-messages",
+  "clients": {
+    "claude": "Claude Code 2.1.322",
+    "omp": "OMP 18.18.8"
+  },
+  "python": "3.13.14",
+  "thinking_requested": "high",
+  "rounds": 2,
+  "tasks": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "attempts_per_task_per_client_per_round": 1,
+  "order": "A-D in each round; paired starts within each task; the two rounds overlap",
+  "wall_limit": null,
+  "evaluation_cases": {
+    "B": 7,
+    "C": 41,
+    "D": 11
+  },
+  "external_source_usage_affects_score": false
+}

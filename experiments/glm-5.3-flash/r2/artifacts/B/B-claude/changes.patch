@@ -1,0 +1,22 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -86,6 +86,11 @@
+         """Receives a Response. Returns a generator of Responses."""
+ 
+         i = 0
++        # Carry the method across hops: a method rewritten by an earlier
++        # redirect (e.g. 303 turning a POST into a GET) must not be reverted
++        # by a later method-preserving redirect (307/308). The first hop uses
++        # the method of the original request.
++        method = req.method
+ 
+         while resp.is_redirect:
+             prepared_request = req.copy()
+@@ -99,7 +104,6 @@
+             resp.close()
+ 
+             url = resp.headers['location']
+-            method = req.method
+ 
+             # Handle redirection without scheme (see: RFC 1808 Section 4)
+             if url.startswith('//'):

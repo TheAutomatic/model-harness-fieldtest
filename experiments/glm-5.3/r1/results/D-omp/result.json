@@ -1,0 +1,13 @@
+{
+  "id": "D-omp",
+  "client": "omp",
+  "model": "glm-5.3",
+  "wall_seconds": 951.289,
+  "exit_code": 0,
+  "prompt_sha256": "6c1c33c3cc58ae59fca7f375e731404c6d2d1965ae1382c4c7defb45ebdb64fc",
+  "verification": {
+    "passed": 10,
+    "total": 11,
+    "all_passed": false
+  }
+}

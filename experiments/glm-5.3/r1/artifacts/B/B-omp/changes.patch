@@ -1,0 +1,43 @@
+--- a/HISTORY.rst
++++ b/HISTORY.rst
+@@ -13,6 +13,12 @@
+   or not it actually did).
+ - The ``timeout`` parameter now affects requests with both ``stream=True`` and
+   ``stream=False`` equally.
++
++**Bugfixes**
++
++- Redirects now build each hop on the previous hop's request. A 307 redirect
++  that follows a 301/302/303 correctly repeats the rewritten bodiless GET
++  instead of reverting to the original method and body.
+ 
+ 2.2.1 (2014-01-23)
+ ++++++++++++++++++
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -86,9 +86,15 @@
+         """Receives a Response. Returns a generator of Responses."""
+ 
+         i = 0
++        # Redirect hops must build on the previous hop's request, not on the
++        # original one: 301/302/303 may rewrite POST into GET (dropping the
++        # body), and a following 307/308 must then repeat that GET rather
++        # than resurrect the original POST (RFC 7231, sections 6.4.4-6.4.8).
++        source_request = req
+ 
+         while resp.is_redirect:
+-            prepared_request = req.copy()
++            prepared_request = source_request.copy()
++            source_request = prepared_request
+ 
+             resp.content  # Consume socket so it can be released
+ 
+@@ -99,7 +105,7 @@
+             resp.close()
+ 
+             url = resp.headers['location']
+-            method = req.method
++            method = prepared_request.method
+ 
+             # Handle redirection without scheme (see: RFC 1808 Section 4)
+             if url.startswith('//'):

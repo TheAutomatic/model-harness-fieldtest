@@ -1,0 +1,178 @@
+{
+  "task": "B",
+  "workspace": "<USER_HOME>\\AppData\\Local\\Temp\\glm53-bxbzk_51",
+  "passed": 7,
+  "total": 7,
+  "all_passed": true,
+  "checks": [
+    {
+      "case": "303_then_307",
+      "pass": true,
+      "seen": [
+        {
+          "method": "POST",
+          "path": "/start",
+          "body": "payload",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop1",
+          "body": "",
+          "auth": null
+        },
+        {
+          "method": "GET",
+          "path": "/hop2",
+          "body": "",
+          "auth": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "case": "302_then_307",
+      "pass": true,
+      "seen": [
+        {
+          "method": "POST",
+          "path": "/start",
+          "body": "payload",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop1",
+          "body": "",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop2",
+          "body": "",
+          "auth": "Bearer offline-test"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case": "301_then_307",
+      "pass": true,
+      "seen": [
+        {
+          "method": "POST",
+          "path": "/start",
+          "body": "payload",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop1",
+          "body": "",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop2",
+          "body": "",
+          "auth": "Bearer offline-test"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case": "direct_307",
+      "pass": true,
+      "seen": [
+        {
+          "method": "POST",
+          "path": "/start",
+          "body": "payload",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "POST",
+          "path": "/hop1",
+          "body": "payload",
+          "auth": "Bearer offline-test"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case": "head_chain",
+      "pass": true,
+      "seen": [
+        {
+          "method": "HEAD",
+          "path": "/start",
+          "body": "",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "HEAD",
+          "path": "/hop1",
+          "body": "",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "HEAD",
+          "path": "/hop2",
+          "body": "",
+          "auth": "Bearer offline-test"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case": "get_chain",
+      "pass": true,
+      "seen": [
+        {
+          "method": "GET",
+          "path": "/start",
+          "body": "",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop1",
+          "body": "",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop2",
+          "body": "",
+          "auth": "Bearer offline-test"
+        }
+      ],
+      "error": null
+    },
+    {
+      "case": "auth_cross_host",
+      "pass": true,
+      "seen": [
+        {
+          "method": "GET",
+          "path": "/start",
+          "body": "",
+          "auth": "Bearer offline-test"
+        },
+        {
+          "method": "GET",
+          "path": "/hop1",
+          "body": "",
+          "auth": null
+        },
+        {
+          "method": "GET",
+          "path": "/hop2",
+          "body": "",
+          "auth": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

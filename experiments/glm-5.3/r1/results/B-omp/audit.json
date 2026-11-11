@@ -1,0 +1,13 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "read": 9,
+    "bash": 11,
+    "edit": 5,
+    "write": 2
+  },
+  "reference_access_flags": [],
+  "scope": "Tool-log audit; hooks are not an OS sandbox."
+}

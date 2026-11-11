@@ -1,0 +1,13 @@
+{
+  "id": "C-omp",
+  "client": "omp",
+  "model": "glm-5.3",
+  "wall_seconds": 123.559,
+  "exit_code": 0,
+  "prompt_sha256": "2352e2dc948274409b51c96904adef91d3136782db982091d23b1204a6920d41",
+  "verification": {
+    "passed": 39,
+    "total": 41,
+    "all_passed": false
+  }
+}

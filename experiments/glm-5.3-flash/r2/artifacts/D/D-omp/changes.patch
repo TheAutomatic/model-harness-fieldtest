@@ -1,0 +1,45 @@
+--- a/changelog/7144.bugfix.rst
++++ b/changelog/7144.bugfix.rst
+@@ -0,0 +1 @@
++Fixed ``unittest.TestCase.addCleanup`` functions not being called when the test failed: resources registered via ``addCleanup`` now run like in plain ``unittest``.
+--- a/changelog/7145.bugfix.rst
++++ b/changelog/7145.bugfix.rst
+@@ -0,0 +1 @@
++Fixed ``unittest.TestCase`` tests erroring with ``RuntimeWarning: TestResult has no addDuration method`` on Python 3.12+.
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -1,4 +1,5 @@
+ """ discovery and running of std-library "unittest" style tests. """
++import contextlib
+ import functools
+ import sys
+ import traceback
+@@ -192,6 +193,11 @@
+     def addSuccess(self, testcase):
+         pass
+ 
++    # Adapted from CPython's unittest.TestResult.addDuration: since we
++    # instrument durations ourselves, it is a no-op (Python 3.12+ calls it).
++    def addDuration(self, testcase, elapsed):
++        pass
++
+     def stopTest(self, testcase):
+         pass
+ 
+@@ -236,7 +242,15 @@
+             try:
+                 self._testcase(result=self)
+             except _GetOutOf_testPartExecutor as exc:
+-                raise exc.args[0] from exc.args[0]
++                if exc.args:
++                    # The exception escaped unittest's testPartExecutor via
++                    # KeyboardInterrupt, so unittest's TestCase.run skipped its
++                    # doCleanups() call (#7109): run the addCleanup functions
++                    # ourselves, errors from them are reported via addError.
++                    with contextlib.suppress(Exception):
++                        self._testcase.doCleanups()
++                    raise exc.args[0] from exc.args[0]
++                raise
+             finally:
+                 delattr(self._testcase, self._testcase._testMethodName)
+ 
