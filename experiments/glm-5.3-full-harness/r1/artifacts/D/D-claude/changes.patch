@@ -1,0 +1,41 @@
+--- a/changelog/7160.bugfix.rst
++++ b/changelog/7160.bugfix.rst
+@@ -0,0 +1,7 @@
++Run cleanups registered with ``unittest.TestCase.addCleanup`` when the test
++fails: previously the escape from unittest's ``testPartExecutor`` skipped
++``TestCase.run()``'s ``doCleanups()``, so resources acquired by a failing test
++were never released. Also implement a no-op ``addDuration`` on the unittest
++result object so Python 3.12+ no longer emits
++``RuntimeWarning: TestResult has no addDuration method`` for every passing or
++skipped unittest test.
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,7 +122,13 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++            try:
++                self._testcase.tearDown()
++            finally:
++                # The test failure interrupted TestCase.run() before it could
++                # run the registered cleanups (see _GetOutOf_testPartExecutor
++                # in runtest()) - run them here as unittest would have.
++                self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+@@ -192,6 +198,13 @@
+     def addSuccess(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        # Duration accounting is handled by pytest itself (CallInfo), this is
++        # just here to satisfy the TestResult protocol on Python 3.12+ which
++        # otherwise emits "RuntimeWarning: TestResult has no addDuration
++        # method".
++        pass
++
+     def stopTest(self, testcase):
+         pass
+ 

@@ -1,5 +1,7 @@
 # GLM-5.3：同一端点下的 Claude Code 与 OMP（两轮）
 
+> **注**：本档为早期仅开放六个基础文件/终端工具的历史记录；保留客户端全套默认内置工具的两轮重测见 **[GLM-5.3（满血开箱）](../glm-5.3-full-harness/README.md)**。
+
 对象是智谱官方接口的 **GLM-5.3**（`https://open.bigmodel.cn/api/anthropic`，Anthropic 兼容协议，thinking 请求 high 档），客户端为 Claude Code `2.1.322` 与 OMP `18.18.6`，系统 Python 3.13.14。题面沿用 DeepSeek 轮的 A–D：鹈鹕 HTML、Requests 重定向（SWE-bench `psf__requests-1963`）、AtCoder ABC378 E、Pytest unittest 清理（SWE-bench `pytest-dev__pytest-7151`）；源码提交、依赖与验收脚本一致，D 题扩为 11 项并在运行前冻结。
 
 每题每客户端每轮一次，不补跑，不与历史轮次排名。第二轮是同配置重跑，主要用于观察单轮结果的方差。

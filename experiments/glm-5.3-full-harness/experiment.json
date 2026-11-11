@@ -1,0 +1,65 @@
+{
+  "title": "GLM-5.3 — two-round full-harness out-of-box field test",
+  "model": "glm-5.3",
+  "rounds": [
+    "r1",
+    "r2"
+  ],
+  "groups_r1": {
+    "claude": "Claude Code 2.1.322 (full default harness)",
+    "omp": "OMP 18.18.8 (full default harness)"
+  },
+  "groups_r2": {
+    "claude": "Claude Code 2.1.322 (full default harness)",
+    "omp": "OMP 18.18.8 (full default harness)"
+  },
+  "endpoint": "https://open.bigmodel.cn/api/anthropic",
+  "protocol": "anthropic-messages",
+  "python": "3.13.14",
+  "thinking_requested": "high",
+  "tasks": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "attempts_per_task_per_client_per_round": 1,
+  "order": "Strict sequential A -> B -> C -> D within each round; claude and omp paired per task with zero cross-task overlap",
+  "wall_limit": null,
+  "historical_comparison": true,
+  "baseline_stripped_experiment": "experiments/glm-5.3",
+  "harness_policy": {
+    "built_in_tools": "All default built-in tools enabled (no --tools whitelist, no --no-lsp, no --no-prewalk, no --no-pty)",
+    "omp_enabled": "read, bash, edit, write, grep, glob, lsp, ast_edit, eval (Python/JS + headless browser), task subagents, todo, pty",
+    "claude_enabled": "Read, Bash, Edit, Write, Glob, Grep, Agent/Explore subagents, TodoWrite, NotebookEdit, Workflow/Skill defaults",
+    "model_role_binding": "All main, subagent, smol, slow, plan, advisor, and haiku/sonnet/opus aliases bound to glm-5.3; fallbackChains cleared",
+    "isolation": "Fresh temporary state dir (empty history.db), private TEMP dir, neutral external deps path, and hook blocking only host repo/configs, sibling workspaces, web_search/WebSearch/WebFetch, and upstream package/repo downloads while allowing localhost"
+  },
+  "D_checks": 11,
+  "D_requirements": [
+    "debug before teardown before LIFO cleanup",
+    "original test failure and cleanup error both reported"
+  ],
+  "upstream": {
+    "B": {
+      "repo": "psf/requests",
+      "instance_id": "psf__requests-1963",
+      "base_commit": "110048f9837f8441ea536804115e80b69f400277"
+    },
+    "D": {
+      "repo": "pytest-dev/pytest",
+      "instance_id": "pytest-dev__pytest-7151",
+      "base_commit": "2b51ed46d54be58da6bbcd28f68149b3fc2cd104"
+    }
+  },
+  "contaminated_initial_runs": [
+    "r1/D-omp",
+    "r2/B-omp"
+  ],
+  "valid_isolated_retries": {
+    "r1/D-omp": "r1/D-omp-retry",
+    "r2/B-omp": "r2/B-omp-retry"
+  },
+  "subagent_spawns_observed": 0,
+  "raw_evidence_in_public_tree": false
+}

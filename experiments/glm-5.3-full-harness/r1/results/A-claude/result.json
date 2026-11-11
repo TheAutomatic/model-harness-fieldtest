@@ -1,0 +1,19 @@
+{
+  "id": "A-claude",
+  "client": "claude",
+  "model": "glm-5.3",
+  "wall_seconds": 433.616,
+  "exit_code": 0,
+  "prompt_sha256": "b7b5898beece0f6298f8cf4db4edc1cebabee1074eabdb4147ac9805c718d66f",
+  "response_models": [
+    "glm-5.3"
+  ],
+  "usage": {
+    "uncached_input_tokens": 59046,
+    "cache_read_input_tokens": 221120,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 24885,
+    "turns": 6,
+    "api_duration_ms": 427361
+  }
+}

@@ -1,0 +1,46 @@
+--- a/HISTORY.rst
++++ b/HISTORY.rst
+@@ -13,6 +13,11 @@
+   or not it actually did).
+ - The ``timeout`` parameter now affects requests with both ``stream=True`` and
+   ``stream=False`` equally.
++- ``resolve_redirects`` now derives the redirected request's method from the
++  request that actually received the redirect response. Previously every hop
++  restarted from the original request's method, so a 307/308 following a
++  303/302/301 wrongly reverted a rewritten GET back to POST (and could
++  resurrect the dropped request body).
+ 
+ 2.2.1 (2014-01-23)
+ ++++++++++++++++++
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -99,7 +99,12 @@
+             resp.close()
+ 
+             url = resp.headers['location']
+-            method = req.method
++            # The method of the request this redirect responds to (resp.request
++            # is the original request on the first hop), not the original
++            # request's method: an earlier 303/302/301 may already have
++            # switched the chain to GET, and a later 307/308 must preserve
++            # that instead of reverting to POST.
++            method = resp.request.method
+ 
+             # Handle redirection without scheme (see: RFC 1808 Section 4)
+             if url.startswith('//'):
+@@ -139,6 +144,15 @@
+ 
+             # https://github.com/kennethreitz/requests/issues/1084
+             if resp.status_code not in (codes.temporary, codes.resume):
++                if 'Content-Length' in prepared_request.headers:
++                    del prepared_request.headers['Content-Length']
++
++                prepared_request.body = None
++
++            # 307/308 replay the request exactly as it was last sent. If an
++            # earlier 301/302/303 already switched the method and dropped the
++            # body, don't resurrect the original request's body here.
++            elif resp.request.body is None:
+                 if 'Content-Length' in prepared_request.headers:
+                     del prepared_request.headers['Content-Length']
+ 

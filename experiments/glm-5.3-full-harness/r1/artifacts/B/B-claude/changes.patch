@@ -1,0 +1,131 @@
+--- a/redirect_matrix.py
++++ b/redirect_matrix.py
+@@ -0,0 +1,113 @@
++"""Exhaustive redirect-method matrix against the local requests checkout."""
++import collections
++for _n in ('Mapping', 'MutableMapping', 'Callable', 'Iterable'):
++    if not hasattr(collections, _n):
++        setattr(collections, _n, getattr(collections.abc, _n))
++
++import sys
++from pathlib import Path
++import threading
++from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
++
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++import requests
++
++
++def run_chain(statuses, initial_method, data=None, headers=None):
++    """Run a redirect chain; return [(method, body, has_content_length)]."""
++    seen = []
++
++    class Handler(BaseHTTPRequestHandler):
++        def handle_request(self):
++            body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
++            seen.append((self.command, body.decode(),
++                         'Content-Length' in self.headers))
++            idx = len(seen) - 1
++            status = statuses[idx] if idx < len(statuses) else 200
++            self.send_response(status)
++            if status != 200:
++                self.send_header('Location', '/hop%d' % (idx + 1))
++            self.send_header('Content-Length', '0')
++            self.end_headers()
++
++        do_POST = do_GET = do_HEAD = do_PUT = do_DELETE = handle_request
++
++        def log_message(self, *a):
++            pass
++
++    server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
++    t = threading.Thread(target=server.serve_forever, daemon=True)
++    t.start()
++    try:
++        with requests.Session() as s:
++            s.trust_env = False
++            fn = getattr(s, initial_method.lower())
++            kwargs = {'timeout': 3}
++            if initial_method == 'head':
++                # Session.head() defaults to allow_redirects=False
++                kwargs['allow_redirects'] = True
++            fn('http://127.0.0.1:%d/start' % server.server_port,
++               data=data, headers=headers, **kwargs)
++    finally:
++        server.shutdown()
++        server.server_close()
++        t.join(timeout=2)
++    return seen
++
++
++CASES = [
++    # (label, statuses, initial method, data, expected [(method, body, has_cl)])
++    ('303 then 307 (the bug)', [303, 307], 'post', 'hello',
++     [('POST', 'hello', True), ('GET', '', False), ('GET', '', False)]),
++    ('303 then 308 (308 not auto-followed in this version)', [303, 308],
++     'post', 'hello',
++     [('POST', 'hello', True), ('GET', '', False)]),
++    ('direct 307 keeps POST+body', [307], 'post', 'hello',
++     [('POST', 'hello', True), ('POST', 'hello', True)]),
++    ('direct 308 (not auto-followed in this version)', [308],
++     'post', 'hello',
++     [('POST', 'hello', True)]),
++    ('307 then 303', [307, 303], 'post', 'hello',
++     [('POST', 'hello', True), ('POST', 'hello', True), ('GET', '', False)]),
++    ('307 then 307', [307, 307], 'post', 'hello',
++     [('POST', 'hello', True), ('POST', 'hello', True),
++      ('POST', 'hello', True)]),
++    ('303 then 303', [303, 303], 'post', 'hello',
++     [('POST', 'hello', True), ('GET', '', False), ('GET', '', False)]),
++    ('302 then 307', [302, 307], 'post', 'hello',
++     [('POST', 'hello', True), ('GET', '', False), ('GET', '', False)]),
++    ('301 on POST -> GET', [301], 'post', 'hello',
++     [('POST', 'hello', True), ('GET', '', False)]),
++    ('302 on POST -> GET', [302], 'post', 'hello',
++     [('POST', 'hello', True), ('GET', '', False)]),
++    ('303 on POST -> GET', [303], 'post', 'hello',
++     [('POST', 'hello', True), ('GET', '', False)]),
++    ('301 on GET stays GET', [301], 'get', None,
++     [('GET', '', False), ('GET', '', False)]),
++    ('GET chain 302,307', [302, 307], 'get', None,
++     [('GET', '', False)] * 3),
++    ('HEAD never rewritten: 303,307', [303, 307], 'head', None,
++     [('HEAD', '', False)] * 3),
++    ('PUT -> 303 -> 307', [303, 307], 'put', 'payload',
++     [('PUT', 'payload', True), ('GET', '', False), ('GET', '', False)]),
++    ('PUT -> 307 keeps PUT', [307], 'put', 'payload',
++     [('PUT', 'payload', True), ('PUT', 'payload', True)]),
++    ('no redirect at all', [], 'post', 'hello',
++     [('POST', 'hello', True)]),
++]
++
++failures = 0
++for label, statuses, method, data, expected in CASES:
++    got = run_chain(statuses, method, data)
++    ok = got == expected
++    if not ok:
++        failures += 1
++    print('%s %-28s statuses=%-12s -> %s' % (
++        'PASS' if ok else 'FAIL', label, statuses,
++        ' '.join('%s%s' % (m, '+' + b if b else '') for m, b, _ in got)))
++    if not ok:
++        print('     expected: %s' % expected)
++
++print()
++print('ALL PASS' if failures == 0 else '%d FAILURES' % failures)
++sys.exit(1 if failures else 0)
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -177,6 +177,12 @@
+                 proxies=proxies,
+                 allow_redirects=False,
+             )
++
++            # Subsequent redirects must build on the request just sent in
++            # this chain (method/body as mutated above, e.g. POST turned
++            # into GET by a 303), not on the original request -- otherwise
++            # a later 307 would resurrect the original method and body.
++            req = prepared_request
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
+ 

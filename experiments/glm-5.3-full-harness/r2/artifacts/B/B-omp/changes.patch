@@ -1,0 +1,15 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -167,6 +167,12 @@
+             new_auth = get_netrc_auth(url) if self.trust_env else None
+             if new_auth is not None:
+                 prepared_request.prepare_auth(new_auth)
++            # Override the original request with the prepared request of the
++            # current hop, so subsequent redirects derive their method and
++            # body from the request that was actually sent last (e.g. a 303
++            # that turned a POST into a GET must stay a GET on a later 307).
++            req = prepared_request
++
+ 
+             resp = self.send(
+                 prepared_request,

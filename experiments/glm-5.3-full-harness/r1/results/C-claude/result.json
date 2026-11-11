@@ -1,0 +1,24 @@
+{
+  "id": "C-claude",
+  "client": "claude",
+  "model": "glm-5.3",
+  "wall_seconds": 312.692,
+  "exit_code": 0,
+  "prompt_sha256": "2352e2dc948274409b51c96904adef91d3136782db982091d23b1204a6920d41",
+  "verification": {
+    "passed": 41,
+    "total": 41,
+    "all_passed": true
+  },
+  "response_models": [
+    "glm-5.3"
+  ],
+  "usage": {
+    "uncached_input_tokens": 19184,
+    "cache_read_input_tokens": 205312,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 16005,
+    "turns": 7,
+    "api_duration_ms": 261655
+  }
+}

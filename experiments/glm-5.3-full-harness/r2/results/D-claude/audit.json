@@ -1,0 +1,29 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "Bash": 47,
+    "Read": 3,
+    "Edit": 5,
+    "Write": 3
+  },
+  "subagent_spawns": 0,
+  "hook_blocks": [
+    {
+      "tool_use_id": "call_d7efa940f4b742158fa23caf",
+      "result": "PreToolUse:Write hook error: [\"<USER_HOME>\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe\" \"<USER_HOME>\\AppData\\Local\\Temp\\glm53fh-guards\\guard.py\"]: Blocked: another workspace is not accessible.\r\n"
+    }
+  ],
+  "reference_access_flags": [],
+  "upstream_source_read": false,
+  "usage": {
+    "uncached_input_tokens": 85293,
+    "cache_read_input_tokens": 2877824,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 43094,
+    "turns": 53,
+    "api_duration_ms": 780590
+  },
+  "scope": "Full-harness tool-log and session-state audit (main + subagents)."
+}

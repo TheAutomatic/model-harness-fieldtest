@@ -1,0 +1,22 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "Write": 1,
+    "Edit": 3
+  },
+  "subagent_spawns": 0,
+  "hook_blocks": [],
+  "reference_access_flags": [],
+  "upstream_source_read": false,
+  "usage": {
+    "uncached_input_tokens": 28367,
+    "cache_read_input_tokens": 122176,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 25432,
+    "turns": 4,
+    "api_duration_ms": 413362
+  },
+  "scope": "Full-harness tool-log and session-state audit (main + subagents)."
+}

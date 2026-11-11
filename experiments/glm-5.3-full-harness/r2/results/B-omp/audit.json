@@ -1,0 +1,40 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "read": 20,
+    "edit": 5,
+    "bash": 6,
+    "write": 1
+  },
+  "subagent_spawns": 0,
+  "hook_blocks": [],
+  "reference_access_flags": [
+    {
+      "name": "read",
+      "args": {
+        "path": "https://raw.githubusercontent.com/psf/requests/main/src/requests/sessions.py"
+      }
+    }
+  ],
+  "upstream_source_read": true,
+  "usage": {
+    "uncached_input_tokens": 32733,
+    "cache_read_input_tokens": 729216,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 13683,
+    "turns": 27,
+    "api_duration_ms": 325968.6550999998,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "turns": 0,
+      "session_files": 1
+    }
+  },
+  "scope": "Full-harness tool-log and session-state audit (main + subagents).",
+  "flag_review": "Invoked OMP read() on raw.githubusercontent.com/psf/requests/main/src/requests/sessions.py; score retained, excluded from independent comparison; see B-omp-retry."
+}

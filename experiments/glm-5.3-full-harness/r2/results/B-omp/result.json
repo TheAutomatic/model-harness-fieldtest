@@ -1,0 +1,35 @@
+{
+  "id": "B-omp",
+  "client": "omp",
+  "model": "glm-5.3",
+  "wall_seconds": 349.399,
+  "exit_code": 0,
+  "prompt_sha256": "e323cf05a525420ea0f5b28f0d4c782d86637834383ee0e7bba44a5115273baa",
+  "verification": {
+    "passed": 7,
+    "total": 7,
+    "all_passed": true
+  },
+  "response_models": [
+    "glm-5.3"
+  ],
+  "usage": {
+    "uncached_input_tokens": 32733,
+    "cache_read_input_tokens": 729216,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 13683,
+    "turns": 27,
+    "api_duration_ms": 325968.6550999998,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "turns": 0,
+      "session_files": 1
+    }
+  },
+  "independent": false,
+  "upstream_source_read": true,
+  "valid_isolated_retry": "B-omp-retry"
+}

@@ -1,0 +1,29 @@
+--- a/HISTORY.rst
++++ b/HISTORY.rst
+@@ -13,6 +13,13 @@
+   or not it actually did).
+ - The ``timeout`` parameter now affects requests with both ``stream=True`` and
+   ``stream=False`` equally.
++
++**Bugfixes**
++
++- Method and body changes made by an earlier redirect (e.g. a 303 turning a
++  POST into a GET) are now carried through subsequent redirects, so a later
++  307/308 preserves the redirected method instead of reverting to the
++  original request's method.
+ 
+ 2.2.1 (2014-01-23)
+ ++++++++++++++++++
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -178,6 +178,10 @@
+                 allow_redirects=False,
+             )
+ 
++            # Carry the current hop's method/body transformations into the
++            # next redirect (e.g. POST downgraded to GET by a 303 must stay
++            # GET when followed by a 307/308, which preserves the method).
++            req = prepared_request
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
+ 
+             i += 1

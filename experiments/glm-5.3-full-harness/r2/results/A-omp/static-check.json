@@ -1,0 +1,27 @@
+{
+  "bytes": 13358,
+  "inline_scripts": 1,
+  "javascript_syntax_errors": [],
+  "runtime_errors": {
+    "entries": [],
+    "nextSeq": 0,
+    "dropped": 0
+  },
+  "has_svg": true,
+  "has_canvas": false,
+  "desktop_1000x700": {
+    "scrollWidth": 1000,
+    "scrollHeight": 700,
+    "clientWidth": 1000,
+    "clientHeight": 700,
+    "svgCount": 1,
+    "canvasCount": 0
+  },
+  "mobile_430x800": {
+    "scrollWidth": 430,
+    "scrollHeight": 800,
+    "clientWidth": 430,
+    "clientHeight": 800
+  },
+  "visual_review": "performed via local HTTP + headless Chromium (screenshot.png, mobile.png)"
+}

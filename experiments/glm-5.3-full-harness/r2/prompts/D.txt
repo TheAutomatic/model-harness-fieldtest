@@ -1,0 +1,1 @@
+我用这份 pytest 跑 unittest 测试，发现测试一失败，addCleanup 注册的清理就没执行，资源会留着。你帮我修一下，别把正常测试、跳过和调试模式弄坏。python run_pytest.py test_reproduce.py -q 能复现，里面那个故意失败的测试不用改。

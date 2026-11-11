@@ -1,0 +1,98 @@
+--- a/changelog/6947.bugfix.rst
++++ b/changelog/6947.bugfix.rst
+@@ -0,0 +1 @@
++Fixed a regression where functions registered with :meth:`unittest.TestCase.addCleanup` were not being called on test failures: pytest no longer breaks out of the unittest ``TestCase.run`` machinery, so ``tearDown`` and cleanups now run for failing tests. ``tearDown`` is only postponed when ``--pdb`` is active, so the debugger still sees the test instance intact.
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -114,15 +114,17 @@
+     _testcase = None
+ 
+     def setup(self):
+-        self._needs_explicit_tearDown = False
++        # A bound method to be called during teardown() if set (see 'runtest()').
++        self._explicit_tearDown = None
+         self._testcase = self.parent.obj(self.name)
+         self._obj = getattr(self._testcase, self.name)
+         if hasattr(self, "_request"):
+             self._request._fillfixtures()
+ 
+     def teardown(self):
+-        if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++        if self._explicit_tearDown is not None:
++            self._explicit_tearDown()
++            self._explicit_tearDown = None
+         self._testcase = None
+         self._obj = None
+ 
+@@ -195,48 +197,36 @@
+     def stopTest(self, testcase):
+         pass
+ 
+-    def _expecting_failure(self, test_method) -> bool:
+-        """Return True if the given unittest method (or the entire class) is marked
+-        with @expectedFailure"""
+-        expecting_failure_method = getattr(
+-            test_method, "__unittest_expecting_failure__", False
+-        )
+-        expecting_failure_class = getattr(self, "__unittest_expecting_failure__", False)
+-        return bool(expecting_failure_class or expecting_failure_method)
++    def addDuration(self, testcase, elapsed):
++        pass
+ 
+     def runtest(self):
+-        # TODO: move testcase reporter into separate class, this shouldnt be on item
+-        import unittest
+-
+         testMethod = getattr(self._testcase, self._testcase._testMethodName)
+-
+-        class _GetOutOf_testPartExecutor(KeyboardInterrupt):
+-            """Helper exception to get out of unittests's testPartExecutor (see TestCase.run)."""
+ 
+         @functools.wraps(testMethod)
+         def wrapped_testMethod(*args, **kwargs):
+             """Wrap the original method to call into pytest's machinery, so other pytest
+             features can have a chance to kick in (notably --pdb)"""
+-            try:
+-                self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+-            except unittest.SkipTest:
+-                raise
+-            except Exception as exc:
+-                expecting_failure = self._expecting_failure(testMethod)
+-                if expecting_failure:
+-                    raise
+-                self._needs_explicit_tearDown = True
+-                raise _GetOutOf_testPartExecutor(exc)
++            self.ihook.pytest_pyfunc_call(pyfuncitem=self)
+ 
+         # let the unittest framework handle async functions
+         if is_async_function(self.obj):
+             self._testcase(self)
+         else:
++            # When --pdb is given, we want to postpone calling tearDown() otherwise
++            # when entering the pdb prompt, tearDown() would have probably cleaned up
++            # instance variables, which makes it difficult to debug the test.
++            # We must not postpone (and later call) tearDown() for a skipped test
++            # however, because unittest never calls tearDown() for skipped tests.
++            if self.config.getoption("usepdb") and not (
++                _is_skipped(testMethod) or _is_skipped(self.parent.obj)
++            ):
++                self._explicit_tearDown = self._testcase.tearDown
++                setattr(self._testcase, "tearDown", lambda *args: None)
++
+             setattr(self._testcase, self._testcase._testMethodName, wrapped_testMethod)
+             try:
+                 self._testcase(result=self)
+-            except _GetOutOf_testPartExecutor as exc:
+-                raise exc.args[0] from exc.args[0]
+             finally:
+                 delattr(self._testcase, self._testcase._testMethodName)
+ 
+@@ -309,3 +299,7 @@
+ 
+     classImplements(TestCaseFunction, IReporter)
+     done.append(1)
++
++def _is_skipped(obj):
++    """Return True if the given object has been marked with @unittest.skip."""
++    return bool(getattr(obj, "__unittest_skip__", False))

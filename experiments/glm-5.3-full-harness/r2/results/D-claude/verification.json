@@ -1,0 +1,212 @@
+{
+  "task": "D",
+  "workspace": "<USER_HOME>\\AppData\\Local\\Temp\\glm53fh2-gji_mv2c",
+  "passed": 10,
+  "total": 11,
+  "all_passed": false,
+  "checks": [
+    {
+      "case": "pass",
+      "pass": true,
+      "events": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 0,
+      "output": ".                                                                        [100%]\n1 passed in 0.03s\n",
+      "stderr": ""
+    },
+    {
+      "case": "failure",
+      "pass": true,
+      "events": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 1,
+      "output": "F                                                                        [100%]\n================================== FAILURES ===================================\n___________________________ TestLifecycle.test_case ___________________________\n\nself = <test_lifecycle.TestLifecycle testMethod=test_case>\n\n    def test_case(self):\n        note('test')\n        if MODE in ('failure', 'pdb_failure'):\n>           assert False, 'intentional failure'\nE           AssertionError: intentional failure\n\n..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py:37: AssertionError\n=========================== short test summary info ===========================\nFAILED ..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py::TestLifecycle::test_case\n1 failed in 0.12s\n",
+      "stderr": ""
+    },
+    {
+      "case": "error",
+      "pass": true,
+      "events": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 1,
+      "output": "F                                                                        [100%]\n================================== FAILURES ===================================\n___________________________ TestLifecycle.test_case ___________________________\n\nself = <test_lifecycle.TestLifecycle testMethod=test_case>\n\n    def test_case(self):\n        note('test')\n        if MODE in ('failure', 'pdb_failure'):\n            assert False, 'intentional failure'\n        if MODE == 'error':\n>           raise ValueError('test broke')\nE           ValueError: test broke\n\n..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py:39: ValueError\n=========================== short test summary info ===========================\nFAILED ..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py::TestLifecycle::test_case\n1 failed in 0.13s\n",
+      "stderr": ""
+    },
+    {
+      "case": "setup_error",
+      "pass": true,
+      "events": [
+        "setup",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 1,
+      "output": "F                                                                        [100%]\n================================== FAILURES ===================================\n___________________________ TestLifecycle.test_case ___________________________\n\nself = <test_lifecycle.TestLifecycle testMethod=test_case>\n\n    def setUp(self):\n        note('setup')\n        self.addCleanup(note, 'cleanup-first')\n        self.addCleanup(note, 'cleanup-last')\n        if MODE == 'setup_error':\n>           raise ValueError('setup broke')\nE           ValueError: setup broke\n\n..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py:25: ValueError\n=========================== short test summary info ===========================\nFAILED ..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py::TestLifecycle::test_case\n1 failed in 0.12s\n",
+      "stderr": ""
+    },
+    {
+      "case": "teardown_error",
+      "pass": true,
+      "events": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 1,
+      "output": "F                                                                        [100%]\n================================== FAILURES ===================================\n___________________________ TestLifecycle.test_case ___________________________\n\nself = <test_lifecycle.TestLifecycle testMethod=test_case>\n\n    def tearDown(self):\n        note('teardown')\n        if MODE == 'teardown_error':\n>           raise ValueError('teardown broke')\nE           ValueError: teardown broke\n\n..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py:32: ValueError\n=========================== short test summary info ===========================\nFAILED ..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py::TestLifecycle::test_case\n1 failed in 0.11s\n",
+      "stderr": ""
+    },
+    {
+      "case": "skip",
+      "pass": true,
+      "events": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 0,
+      "output": "s                                                                        [100%]\n1 skipped in 0.03s\n",
+      "stderr": ""
+    },
+    {
+      "case": "setup_skip",
+      "pass": true,
+      "events": [
+        "setup",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 0,
+      "output": "s                                                                        [100%]\n1 skipped in 0.02s\n",
+      "stderr": ""
+    },
+    {
+      "case": "pdb_failure",
+      "pass": true,
+      "events": [
+        "setup",
+        "test",
+        "debug",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 1,
+      "output": "F\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> traceback >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\nself = <test_lifecycle.TestLifecycle testMethod=test_case>\n\n    def test_case(self):\n        note('test')\n        if MODE in ('failure', 'pdb_failure'):\n>           assert False, 'intentional failure'\nE           AssertionError: intentional failure\n\n..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py:37: AssertionError\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> entering PDB >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n>>>>>>>>>>>>>>>>>> PDB post_mortem (IO-capturing turned off) >>>>>>>>>>>>>>>>>>\n                                                                         [100%]\n=========================== short test summary info ===========================\nFAILED ..\\dstest-d-accept-78p8zwv2\\test_lifecycle.py::TestLifecycle::test_case\n1 failed in 0.12s\n",
+      "stderr": ""
+    },
+    {
+      "case": "trace_pass",
+      "pass": true,
+      "events": [
+        "setup",
+        "debug",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "expected_without_debug": [
+        "setup",
+        "test",
+        "teardown",
+        "cleanup-last",
+        "cleanup-first"
+      ],
+      "exit_code": 0,
+      "output": "\n>>>>>>>>>>>>>>>>>>>> PDB runcall (IO-capturing turned off) >>>>>>>>>>>>>>>>>>>>\n.                                                                        [100%]\n1 passed in 0.02s\n",
+      "stderr": ""
+    },
+    {
+      "case": "expected_failure",
+      "pass": true,
+      "events": [
+        "expected-cleanup"
+      ],
+      "output": "x                                                                        [100%]\n1 xfailed in 0.11s\n"
+    },
+    {
+      "case": "failure_and_cleanup_error",
+      "pass": false,
+      "diagnostic": {
+        "exit_code": 1,
+        "cleanup_error_visible": false,
+        "original_failure_visible": true,
+        "stdout": "F                                                                        [100%]\n================================== FAILURES ===================================\n_______________ TestCleanupError.test_failure_and_cleanup_error _______________\n\nself = <test_cleanup_error.TestCleanupError testMethod=test_failure_and_cleanup_error>\n\n    def test_failure_and_cleanup_error(self):\n        self.addCleanup(cleanup_error)\n>       assert False, \"original sentinel failure\"\nE       AssertionError: original sentinel failure\n\n..\\dstest-cleanup-diagnostic-8xzkw54r\\test_cleanup_error.py:9: AssertionError\n=========================== short test summary info ===========================\nFAILED ..\\dstest-cleanup-diagnostic-8xzkw54r\\test_cleanup_error.py::TestCleanupError::test_failure_and_cleanup_error\n1 failed in 0.11s\n",
+        "stderr": "",
+        "preplanned_glm53": true
+      }
+    }
+  ]
+}

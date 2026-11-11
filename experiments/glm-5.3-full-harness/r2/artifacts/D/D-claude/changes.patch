@@ -1,0 +1,82 @@
+--- a/changelog/9885.bugfix.rst
++++ b/changelog/9885.bugfix.rst
+@@ -0,0 +1,9 @@
++Run cleanups registered with :meth:`unittest.TestCase.addCleanup <unittest.TestCase.addCleanup>`
++also when the test fails: pytest interrupts ``unittest.TestCase.run`` to report
++the failure itself, which previously skipped the ``doCleanups`` call at the end
++of ``TestCase.run``, leaking resources registered via ``addCleanup``.
++
++Also implement the ``addDuration`` method of the unittest result protocol
++(a no-op, as pytest measures durations itself), silencing the
++``RuntimeWarning: TestResult has no addDuration method`` emitted by
++``unittest.TestCase.run`` on Python 3.12+.
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,7 +122,14 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++            try:
++                self._testcase.tearDown()
++            finally:
++                # The test failure interrupted unittest's TestCase.run() before
++                # it could run the cleanups (we raise _GetOutOf_testPartExecutor
++                # to break out of its testPartExecutor), so run them here the
++                # same way TestCase.run() would have.
++                self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+@@ -195,6 +202,12 @@
+     def stopTest(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        # Required by unittest's TestCase.run() on Python 3.12+; pytest
++        # measures durations itself, so this is a no-op (otherwise unittest
++        # emits "TestResult has no addDuration method" RuntimeWarning).
++        pass
++
+     def _expecting_failure(self, test_method) -> bool:
+         """Return True if the given unittest method (or the entire class) is marked
+         with @expectedFailure"""
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -207,6 +207,36 @@
+     gc.collect()
+     for obj in gc.get_objects():
+         assert type(obj).__name__ != "TestCaseObjectsShouldBeCleanedUp"
++
++
++def test_cleanup_functions_executed_on_failure(testdir):
++    """
++    Cleanups registered with `TestCase.addCleanup` must also be executed when
++    the test fails: pytest interrupts `unittest.TestCase.run` (raising
++    `_GetOutOf_testPartExecutor`) to report the failure itself, which used to
++    skip the `doCleanups` call at the end of `TestCase.run`, leaking resources
++    registered via `addCleanup`.
++    """
++    testpath = testdir.makepyfile(
++        """
++        import unittest
++
++        cleanups = []
++
++        class MyTestCase(unittest.TestCase):
++            def test_1_pass(self):
++                self.addCleanup(cleanups.append, "pass")
++
++            def test_2_fail(self):
++                self.addCleanup(cleanups.append, "fail")
++                assert False, 'intentional'
++
++            def test_3_check(self):
++                self.assertEqual(cleanups, ["pass", "fail"])
++    """
++    )
++    reprec = testdir.inline_run(testpath)
++    reprec.assertoutcome(passed=2, failed=1)
+ 
+ 
+ def test_unittest_skip_issue148(testdir):

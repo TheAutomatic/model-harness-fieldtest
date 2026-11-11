@@ -1,0 +1,40 @@
+{
+  "response_models": [
+    "glm-5.3"
+  ],
+  "tool_counts": {
+    "read": 10,
+    "bash": 13,
+    "grep": 3,
+    "glob": 1,
+    "web_search": 1,
+    "edit": 7,
+    "write": 2
+  },
+  "subagent_spawns": 0,
+  "hook_blocks": [
+    {
+      "tool": "web_search",
+      "result": "{\"content\": [{\"type\": \"text\", \"text\": \"Blocked: external web search/fetch is disabled in this benchmark; use local workspace and local tools only.\"}], \"details\": {}}"
+    }
+  ],
+  "reference_access_flags": [],
+  "upstream_source_read": false,
+  "usage": {
+    "uncached_input_tokens": 42449,
+    "cache_read_input_tokens": 887936,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 31203,
+    "turns": 26,
+    "api_duration_ms": 558623.1059,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "turns": 0,
+      "session_files": 1
+    }
+  },
+  "scope": "Full-harness tool-log and session-state audit (main + subagents)."
+}

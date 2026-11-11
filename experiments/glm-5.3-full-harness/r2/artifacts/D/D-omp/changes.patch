@@ -1,0 +1,26 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,7 +122,11 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
++            # If the test failed, we bailed out of unittest's TestCase.run()
++            # early (via _GetOutOf_testPartExecutor in runtest), skipping its
++            # calls to tearDown() and doCleanups() -- run them here instead.
+             self._testcase.tearDown()
++            self._testcase.doCleanups()
+         self._testcase = None
+         self._obj = None
+ 
+@@ -195,6 +199,11 @@
+     def stopTest(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        # Python 3.12+ TestResult protocol -- unittest's TestCase.run() warns
++        # at the end of every test if the result object lacks this method.
++        pass
++
+     def _expecting_failure(self, test_method) -> bool:
+         """Return True if the given unittest method (or the entire class) is marked
+         with @expectedFailure"""

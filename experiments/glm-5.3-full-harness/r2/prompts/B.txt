@@ -1,0 +1,1 @@
+我这份 requests 遇到个重定向 bug：发 POST，经过 303 已经变成 GET 了，再遇到 307 却又变回 POST。你帮我修一下，别影响其他正常的重定向。跑 python reproduce.py 能看到这个问题。
