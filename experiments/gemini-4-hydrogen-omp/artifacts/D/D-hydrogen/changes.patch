@@ -1,0 +1,135 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -122,9 +122,33 @@
+ 
+     def teardown(self):
+         if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
++            teardown_failed = False
++            try:
++                self._testcase.tearDown()
++            except BaseException:
++                teardown_failed = True
++                raise
++            finally:
++                self._do_cleanups(suppress_exc=teardown_failed)
+         self._testcase = None
+         self._obj = None
++
++    def _do_cleanups(self, suppress_exc: bool = False) -> None:
++        if not suppress_exc:
++            import unittest.case
++
++            outcome_cls = getattr(unittest.case, "_Outcome", None)
++            if (
++                outcome_cls is not None
++                and getattr(self._testcase, "_outcome", None) is None
++            ):
++                self._testcase._outcome = outcome_cls(self)
++                try:
++                    self._testcase.doCleanups()
++                finally:
++                    self._testcase._outcome = None
++                return
++        self._testcase.doCleanups()
+ 
+     def startTest(self, testcase):
+         pass
+@@ -195,6 +219,9 @@
+     def stopTest(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        pass
++
+     def _expecting_failure(self, test_method) -> bool:
+         """Return True if the given unittest method (or the entire class) is marked
+         with @expectedFailure"""
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -1146,3 +1146,85 @@
+     testdir.copy_example("unittest/test_unittest_asynctest.py")
+     reprec = testdir.inline_run()
+     reprec.assertoutcome(failed=1, passed=2)
++
++
++def test_addcleanup_on_failure(testdir):
++    testpath = testdir.makepyfile(
++        """
++        import unittest
++
++        events = []
++
++        class MyTestCase(unittest.TestCase):
++            def setUp(self):
++                self.addCleanup(events.append, ("setup_cleanup", self._testMethodName))
++
++            def tearDown(self):
++                events.append(("tearDown", self._testMethodName))
++
++            def test_1_pass(self):
++                self.addCleanup(events.append, ("test_cleanup", self._testMethodName))
++
++            def test_2_fail(self):
++                self.addCleanup(events.append, ("test_cleanup_1", self._testMethodName))
++                self.addCleanup(events.append, ("test_cleanup_2", self._testMethodName))
++                assert False, "intentional"
++
++            def test_3_verify(self):
++                assert events == [
++                    ("tearDown", "test_1_pass"),
++                    ("test_cleanup", "test_1_pass"),
++                    ("setup_cleanup", "test_1_pass"),
++                    ("tearDown", "test_2_fail"),
++                    ("test_cleanup_2", "test_2_fail"),
++                    ("test_cleanup_1", "test_2_fail"),
++                    ("setup_cleanup", "test_2_fail"),
++                ]
++        """
++    )
++    reprec = testdir.inline_run("--assert=plain", testpath)
++    reprec.assertoutcome(passed=2, failed=1)
++
++
++def test_addcleanup_runs_when_teardown_or_cleanup_fails(testdir):
++    testpath = testdir.makepyfile(
++        """
++        import unittest
++
++        events = []
++
++        class TestTearDownError(unittest.TestCase):
++            def tearDown(self):
++                events.append("tearDown")
++                raise RuntimeError("teardown boom")
++
++            def test_fail(self):
++                self.addCleanup(events.append, "cleanup_after_teardown_error")
++                assert False, "test boom"
++
++        class TestCleanupError(unittest.TestCase):
++            def test_fail(self):
++                def bad():
++                    events.append("bad_cleanup")
++                    raise RuntimeError("cleanup boom")
++                self.addCleanup(events.append, "cleanup_after_bad")
++                self.addCleanup(bad)
++                assert False, "test boom 2"
++
++        def test_verify():
++            assert events == [
++                "tearDown",
++                "cleanup_after_teardown_error",
++                "bad_cleanup",
++                "cleanup_after_bad",
++            ]
++        """
++    )
++    result = testdir.runpytest("--assert=plain", testpath)
++    result.stdout.fnmatch_lines(
++        [
++            "*RuntimeError: teardown boom*",
++            "*RuntimeError: cleanup boom*",
++            "*2 failed, 1 passed, 2 errors*",
++        ]
++    )

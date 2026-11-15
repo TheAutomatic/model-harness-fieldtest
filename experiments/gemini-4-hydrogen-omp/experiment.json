@@ -1,0 +1,52 @@
+{
+  "title": "Gemini 4 Hydrogen vs Hydrogen-xHigh — single-round OMP full-harness field test (thinking=xhigh)",
+  "models": {
+    "hydrogen": "gemini-4-hydrogen (openai-completions /v1, thinking=xhigh)",
+    "hydrogen-xhigh": "gemini-4-hydrogen-xhigh (google-generative-ai /v1beta, thinking=xhigh)"
+  },
+  "client": "OMP 18.20.2 (full default harness)",
+  "rounds": [
+    "single-round"
+  ],
+  "protocols": {
+    "hydrogen": "openai-completions",
+    "hydrogen-xhigh": "google-generative-ai"
+  },
+  "python": "3.13.14",
+  "thinking_requested": "xhigh",
+  "tasks": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ],
+  "attempts_per_task_per_model": 1,
+  "order": "Strict sequential A -> B -> C -> D; hydrogen and hydrogen-xhigh paired per task with zero cross-task overlap",
+  "wall_limit": 2700,
+  "harness_policy": {
+    "built_in_tools": "All default OMP built-in tools enabled (no --tools whitelist, no --no-lsp, no --no-prewalk, no --no-pty)",
+    "omp_enabled": "read, bash, edit, write, grep, glob, lsp, ast_edit, eval (Python/JS + headless browser), task subagents, todo, pty",
+    "model_role_binding": "All 9 modelRoles (default, smol, slow, plan, task, advisor, commit, tiny, widget) and all 6 task.agentModelOverrides bound to the tested model at :xhigh; fallbackChains cleared",
+    "isolation": "Fresh temporary PI_CODING_AGENT_DIR (empty history.db, local SYSTEM_TEMPLATE.md preserved), private TEMP dir, neutral external deps path, and extension guard blocking host repo/configs, sibling workspaces, web_search, external read(URL), and upstream package/repo downloads while allowing localhost"
+  },
+  "D_checks": 11,
+  "D_requirements": [
+    "debug before teardown before LIFO cleanup",
+    "original test failure and cleanup error both reported"
+  ],
+  "upstream": {
+    "B": {
+      "repo": "psf/requests",
+      "instance_id": "psf__requests-1963",
+      "base_commit": "110048f9837f8441ea536804115e80b69f400277"
+    },
+    "D": {
+      "repo": "pytest-dev/pytest",
+      "instance_id": "pytest-dev__pytest-7151",
+      "base_commit": "2b51ed46d54be58da6bbcd28f68149b3fc2cd104"
+    }
+  },
+  "contaminated_initial_runs": [],
+  "subagent_spawns_observed": 0,
+  "raw_evidence_in_public_tree": false
+}

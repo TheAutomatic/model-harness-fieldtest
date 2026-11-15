@@ -1,0 +1,40 @@
+{
+  "response_models": [
+    "gemini-4-hydrogen-xhigh"
+  ],
+  "api_protocols": [
+    "google-generative-ai"
+  ],
+  "tool_counts": {
+    "glob": 4,
+    "read": 42,
+    "bash": 32,
+    "grep": 10,
+    "edit": 6
+  },
+  "subagent_spawns": 0,
+  "hook_blocks": [],
+  "reference_access_flags": [],
+  "upstream_source_read": false,
+  "usage": {
+    "uncached_input_tokens": 266420,
+    "cache_read_input_tokens": 7927402,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 101291,
+    "reasoning_tokens": 82231,
+    "turns": 57,
+    "api_duration_ms": 694270.0040000002,
+    "cost_usd": 1.753868,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "turns": 0,
+      "cost_usd": 0.0,
+      "session_files": 2
+    }
+  },
+  "scope": "Full-harness OMP tool-log and session-state audit (main + subagents)."
+}

@@ -1,0 +1,40 @@
+{
+  "id": "C-hydrogen-xhigh",
+  "client": "omp",
+  "model": "gemini-4-hydrogen-xhigh",
+  "thinking_level": "xhigh",
+  "wall_seconds": 66.859,
+  "exit_code": 0,
+  "prompt_sha256": "2352e2dc948274409b51c96904adef91d3136782db982091d23b1204a6920d41",
+  "verification": {
+    "passed": 41,
+    "total": 41,
+    "all_passed": true
+  },
+  "response_models": [
+    "gemini-4-hydrogen-xhigh"
+  ],
+  "api_protocols": [
+    "google-generative-ai"
+  ],
+  "usage": {
+    "uncached_input_tokens": 20705,
+    "cache_read_input_tokens": 57702,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 8654,
+    "reasoning_tokens": 6580,
+    "turns": 6,
+    "api_duration_ms": 56164.8059,
+    "cost_usd": 0.10029,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "turns": 0,
+      "cost_usd": 0.0,
+      "session_files": 2
+    }
+  }
+}

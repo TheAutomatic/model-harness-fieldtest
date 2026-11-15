@@ -1,0 +1,245 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -1,4 +1,5 @@
+ """ discovery and running of std-library "unittest" style tests. """
++import contextlib
+ import functools
+ import sys
+ import traceback
+@@ -11,6 +12,7 @@
+ from _pytest.outcomes import exit
+ from _pytest.outcomes import fail
+ from _pytest.outcomes import skip
++from _pytest.outcomes import TEST_OUTCOME
+ from _pytest.outcomes import xfail
+ from _pytest.python import Class
+ from _pytest.python import Function
+@@ -112,6 +114,7 @@
+     nofuncargs = True
+     _excinfo = None
+     _testcase = None
++    _needs_explicit_tearDown = False
+ 
+     def setup(self):
+         self._needs_explicit_tearDown = False
+@@ -121,10 +124,58 @@
+             self._request._fillfixtures()
+ 
+     def teardown(self):
+-        if self._needs_explicit_tearDown:
+-            self._testcase.tearDown()
+-        self._testcase = None
+-        self._obj = None
++        try:
++            if self._needs_explicit_tearDown:
++                tear_down_exc = None
++                try:
++                    self._testcase.tearDown()
++                except TEST_OUTCOME as exc:
++                    tear_down_exc = exc
++
++                cleanup_exc = self._do_cleanups()
++                if tear_down_exc is not None:
++                    raise tear_down_exc
++                if cleanup_exc is not None:
++                    raise cleanup_exc
++        finally:
++            self._testcase = None
++            self._obj = None
++
++    def _do_cleanups(self):
++        cleanup_exc = None
++
++        class _TeardownOutcome:
++            success = True
++            result_supports_subtests = False
++
++            @contextlib.contextmanager
++            def testPartExecutor(outcome_self, test_case, subTest=False):
++                try:
++                    yield
++                except (KeyboardInterrupt, SystemExit, exit.Exception):
++                    raise
++                except BaseException as exc:
++                    nonlocal cleanup_exc
++                    outcome_self.success = False
++                    if cleanup_exc is None:
++                        cleanup_exc = exc
++
++        has_outcome = hasattr(self._testcase, "_outcome")
++        if has_outcome:
++            old_outcome = self._testcase._outcome
++            self._testcase._outcome = _TeardownOutcome()
++        try:
++            self._testcase.doCleanups()
++        except (KeyboardInterrupt, SystemExit, exit.Exception):
++            raise
++        except TEST_OUTCOME as exc:
++            if cleanup_exc is None:
++                cleanup_exc = exc
++        finally:
++            if has_outcome:
++                self._testcase._outcome = old_outcome
++
++        return cleanup_exc
+ 
+     def startTest(self, testcase):
+         pass
+@@ -195,6 +246,9 @@
+     def stopTest(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        pass
++
+     def _expecting_failure(self, test_method) -> bool:
+         """Return True if the given unittest method (or the entire class) is marked
+         with @expectedFailure"""
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -1146,3 +1146,145 @@
+     testdir.copy_example("unittest/test_unittest_asynctest.py")
+     reprec = testdir.inline_run()
+     reprec.assertoutcome(failed=1, passed=2)
++
++
++def test_cleanup_on_failure(testdir):
++    """addCleanup callbacks run in LIFO order after tearDown even when tests fail."""
++    testdir.makepyfile(
++        """
++        import unittest
++
++        events = []
++
++        class MyTestCase(unittest.TestCase):
++            def setUp(self):
++                self.addCleanup(events.append, (self._testMethodName, "setup"))
++
++            def tearDown(self):
++                events.append((self._testMethodName, "tearDown"))
++                self.addCleanup(events.append, (self._testMethodName, "teardown_cleanup"))
++
++            def test_1_pass(self):
++                self.addCleanup(events.append, ("test_1_pass", "test"))
++
++            def test_2_fail(self):
++                self.addCleanup(events.append, ("test_2_fail", "test"))
++                assert False, "intentional"
++
++            def test_3_skip(self):
++                self.addCleanup(events.append, ("test_3_skip", "test"))
++                self.skipTest("skipping")
++
++            @unittest.expectedFailure
++            def test_4_xfail(self):
++                self.addCleanup(events.append, ("test_4_xfail", "test"))
++                assert False
++
++        def test_z_verify():
++            assert events == [
++                ("test_1_pass", "tearDown"),
++                ("test_1_pass", "teardown_cleanup"),
++                ("test_1_pass", "test"),
++                ("test_1_pass", "setup"),
++                ("test_2_fail", "tearDown"),
++                ("test_2_fail", "teardown_cleanup"),
++                ("test_2_fail", "test"),
++                ("test_2_fail", "setup"),
++                ("test_3_skip", "tearDown"),
++                ("test_3_skip", "teardown_cleanup"),
++                ("test_3_skip", "test"),
++                ("test_3_skip", "setup"),
++                ("test_4_xfail", "tearDown"),
++                ("test_4_xfail", "teardown_cleanup"),
++                ("test_4_xfail", "test"),
++                ("test_4_xfail", "setup"),
++            ]
++    """
++    )
++    reprec = testdir.inline_run("-rx")
++    reprec.assertoutcome(passed=2, skipped=2, failed=1)
++
++
++def test_cleanup_and_teardown_errors_on_failure(testdir):
++    """Cleanups still run if tearDown fails, and cleanup errors are reported at teardown."""
++    testdir.makepyfile(
++        """
++        import unittest
++
++        events = []
++
++        class FailingTearDown(unittest.TestCase):
++            def tearDown(self):
++                raise RuntimeError("teardown boom")
++
++            def test_fail(self):
++                self.addCleanup(events.append, "ran_after_failing_teardown")
++                self.addCleanup(lambda: 1 / 0)
++                assert False, "test boom"
++
++        class FailingCleanup(unittest.TestCase):
++            def test_fail(self):
++                self.addCleanup(events.append, "ran_after_failing_cleanup")
++                self.addCleanup(lambda: 1 / 0)
++                assert False, "test boom"
++
++        def test_z_verify():
++            assert events == [
++                "ran_after_failing_teardown",
++                "ran_after_failing_cleanup",
++            ]
++    """
++    )
++    result = testdir.runpytest()
++    result.stdout.fnmatch_lines(
++        [
++            "*ERROR at teardown of FailingTearDown.test_fail*",
++            "*RuntimeError: teardown boom*",
++            "*ERROR at teardown of FailingCleanup.test_fail*",
++            "*ZeroDivisionError*",
++            "*2 failed, 1 passed, 2 errors*",
++        ]
++    )
++
++
++def test_cleanup_runs_after_exception_interact(testdir):
++    """tearDown and addCleanup run after pytest_exception_interact (e.g. --pdb)."""
++    testdir.makepyfile(shared="events = []\n")
++    testdir.makeconftest(
++        """
++        import shared
++
++        def pytest_exception_interact(node, call, report):
++            if call.when == "call" and hasattr(node, "_testcase"):
++                shared.events.append(("interact", node._testcase.state))
++    """
++    )
++    testdir.makepyfile(
++        """
++        import unittest
++        import shared
++
++        class MyTestCase(unittest.TestCase):
++            def setUp(self):
++                self.state = "open"
++                self.addCleanup(lambda: shared.events.append(("setup_cleanup", self.state)))
++
++            def tearDown(self):
++                shared.events.append(("tearDown", self.state))
++                self.state = "closed"
++
++            def test_fail(self):
++                self.addCleanup(lambda: shared.events.append(("test_cleanup", self.state)))
++                assert False
++
++        def test_z_verify():
++            assert shared.events == [
++                ("interact", "open"),
++                ("tearDown", "open"),
++                ("test_cleanup", "closed"),
++                ("setup_cleanup", "closed"),
++            ]
++    """
++    )
++    reprec = testdir.inline_run()
++    reprec.assertoutcome(passed=1, failed=1)

@@ -1,0 +1,45 @@
+{
+  "response_models": [
+    "gemini-4-hydrogen"
+  ],
+  "api_protocols": [
+    "openai-completions"
+  ],
+  "tool_counts": {
+    "glob": 1,
+    "read": 16,
+    "bash": 12,
+    "grep": 5,
+    "edit": 1
+  },
+  "subagent_spawns": 0,
+  "hook_blocks": [
+    {
+      "tool": "bash",
+      "result": "{\"content\": [{\"type\": \"text\", \"text\": \"Blocked: another workspace is not accessible.\"}], \"details\": {}}"
+    }
+  ],
+  "reference_access_flags": [],
+  "upstream_source_read": false,
+  "usage": {
+    "uncached_input_tokens": 83647,
+    "cache_read_input_tokens": 671587,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 19490,
+    "reasoning_tokens": 13467,
+    "turns": 22,
+    "api_duration_ms": 168435.10290000006,
+    "cost_usd": 0.322015,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "turns": 0,
+      "cost_usd": 0.0,
+      "session_files": 2
+    }
+  },
+  "scope": "Full-harness OMP tool-log and session-state audit (main + subagents)."
+}

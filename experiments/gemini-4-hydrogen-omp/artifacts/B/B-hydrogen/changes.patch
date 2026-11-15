@@ -1,0 +1,11 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -179,6 +179,8 @@
+             )
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
++
++            req = prepared_request
+ 
+             i += 1
+             yield resp

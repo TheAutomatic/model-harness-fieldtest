@@ -6,6 +6,7 @@
 
 | 实验记录 | 对比组合 | 看点 |
 |---|---|---|
+| [Gemini 4 Hydrogen vs Hydrogen-xHigh（OMP 满血开箱）](experiments/gemini-4-hydrogen-omp/README.md) | `hydrogen` vs `hydrogen-xhigh`（均开 `xhigh`）× OMP `18.20.2` | 客观题双双 `7/7 + 41/41 + 11/11` 独立大满贯，A 题调内置浏览器截图多模态自检改画；`xhigh` 款思考量 `2.81×`、成本 `2.06×`、耗时 `1.80×` |
 | [GLM-5.3（满血开箱）](experiments/glm-5.3-full-harness/README.md) | 智谱官方 API × OMP / Claude Code | 放开客户端默认全套工具重跑两轮：子代理 0 触发，OMP 主动调内置浏览器自检，Token 账单 Claude 约 1.44×；抓到 `read(URL)` 旁路并独立补测 |
 | [GLM-5.3-Flash（精简工具）](experiments/glm-5.3-flash/README.md) | 智谱官方 API × OMP / Claude Code | 同题两轮重跑：方差大过客户端差异；B 有“只修方法不修根因”的样本，D 两组独立写出 11/11、一组早调清理掉到 7/11 |
 | [GLM-5.3（精简工具）](experiments/glm-5.3/README.md) | 智谱官方 API × OMP / Claude Code | 早期仅开放六个基础工具的两轮记录：B/C 饱和、D 拉出方案光谱；第二轮 Claude 经 pip download 读上游 |

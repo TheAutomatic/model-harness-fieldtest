@@ -1,0 +1,32 @@
+<TEMP_WORKSPACE>\requests\packages\urllib3\poolmanager.py:48: SyntaxWarning: invalid escape sequence '\*'
+  :param \**connection_pool_kw:
+<TEMP_WORKSPACE>\requests\models.py:743: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``json.loads`` takes.
+<TEMP_WORKSPACE>\requests\api.py:51: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\api.py:62: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\api.py:73: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\api.py:85: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\api.py:96: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\api.py:107: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\api.py:117: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\sessions.py:403: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\sessions.py:413: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\sessions.py:423: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\sessions.py:434: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\sessions.py:444: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\sessions.py:454: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.
+<TEMP_WORKSPACE>\requests\sessions.py:463: SyntaxWarning: invalid escape sequence '\*'
+  :param \*\*kwargs: Optional arguments that ``request`` takes.

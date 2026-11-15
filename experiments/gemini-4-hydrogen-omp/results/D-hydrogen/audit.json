@@ -1,0 +1,41 @@
+{
+  "response_models": [
+    "gemini-4-hydrogen"
+  ],
+  "api_protocols": [
+    "openai-completions"
+  ],
+  "tool_counts": {
+    "glob": 2,
+    "read": 24,
+    "bash": 12,
+    "grep": 3,
+    "eval": 11,
+    "edit": 4
+  },
+  "subagent_spawns": 0,
+  "hook_blocks": [],
+  "reference_access_flags": [],
+  "upstream_source_read": false,
+  "usage": {
+    "uncached_input_tokens": 216230,
+    "cache_read_input_tokens": 2931183,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 42200,
+    "reasoning_tokens": 33089,
+    "turns": 39,
+    "api_duration_ms": 375368.7640999999,
+    "cost_usd": 0.860684,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "turns": 0,
+      "cost_usd": 0.0,
+      "session_files": 2
+    }
+  },
+  "scope": "Full-harness OMP tool-log and session-state audit (main + subagents)."
+}

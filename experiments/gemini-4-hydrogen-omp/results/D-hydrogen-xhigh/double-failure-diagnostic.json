@@ -1,0 +1,7 @@
+{
+  "post_hoc": true,
+  "not_part_of_11_point_score": true,
+  "scenario": "test and tearDown both fail",
+  "cleanup_ran": true,
+  "exit_code": 1
+}

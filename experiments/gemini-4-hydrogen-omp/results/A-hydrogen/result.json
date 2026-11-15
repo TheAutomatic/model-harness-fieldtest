@@ -1,0 +1,35 @@
+{
+  "id": "A-hydrogen",
+  "client": "omp",
+  "model": "gemini-4-hydrogen",
+  "thinking_level": "xhigh",
+  "wall_seconds": 226.648,
+  "exit_code": 0,
+  "prompt_sha256": "b7b5898beece0f6298f8cf4db4edc1cebabee1074eabdb4147ac9805c718d66f",
+  "response_models": [
+    "gemini-4-hydrogen"
+  ],
+  "api_protocols": [
+    "openai-completions"
+  ],
+  "usage": {
+    "uncached_input_tokens": 85484,
+    "cache_read_input_tokens": 256539,
+    "cache_creation_input_tokens": 0,
+    "output_tokens": 38705,
+    "reasoning_tokens": 5440,
+    "turns": 9,
+    "api_duration_ms": 221402.0108,
+    "cost_usd": 0.437754,
+    "subagent_usage": {
+      "uncached_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_tokens": 0,
+      "turns": 0,
+      "cost_usd": 0.0,
+      "session_files": 2
+    }
+  }
+}
