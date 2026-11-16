@@ -1,0 +1,14 @@
+{
+  "client": "antigravity-cli (official)",
+  "channel": "official Antigravity direct",
+  "tool_counts": {
+    "read": 39,
+    "edit": 9,
+    "command": 37
+  },
+  "total_actions": 85,
+  "web_or_external_actions": 0,
+  "upstream_source_read": false,
+  "thought_summarizer_snippet": "Executing test scripts to reproduce the reported issue and verify edge cases...",
+  "scope": "Official Antigravity CLI interactive session action summary + patch/artifact provenance check."
+}

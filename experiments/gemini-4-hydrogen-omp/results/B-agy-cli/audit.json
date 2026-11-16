@@ -1,0 +1,14 @@
+{
+  "client": "antigravity-cli (official)",
+  "channel": "official Antigravity direct",
+  "tool_counts": {
+    "read": 20,
+    "edit": 4,
+    "command": 16
+  },
+  "total_actions": 40,
+  "web_or_external_actions": 0,
+  "upstream_source_read": false,
+  "thought_summarizer_snippet": "I'm thinking through how to approach this.",
+  "scope": "Official Antigravity CLI interactive session action summary + patch/artifact provenance check."
+}

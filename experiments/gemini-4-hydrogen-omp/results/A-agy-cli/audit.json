@@ -1,0 +1,14 @@
+{
+  "client": "antigravity-cli (official)",
+  "channel": "official Antigravity direct",
+  "tool_counts": {
+    "read": 7,
+    "edit": 2,
+    "command": 5
+  },
+  "total_actions": 14,
+  "web_or_external_actions": 0,
+  "upstream_source_read": false,
+  "thought_summarizer_snippet": "Initial line count seemed high, specifically from 760-985, raising a question about `read_file`'s line counting method...",
+  "scope": "Official Antigravity CLI interactive session action summary + patch/artifact provenance check."
+}

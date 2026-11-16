@@ -1,0 +1,14 @@
+{
+  "client": "antigravity-cli (official)",
+  "channel": "official Antigravity direct",
+  "tool_counts": {
+    "read": 1,
+    "edit": 1,
+    "command": 11
+  },
+  "total_actions": 13,
+  "web_or_external_actions": 0,
+  "upstream_source_read": false,
+  "thought_summarizer_snippet": "Initial observation: `main.py` appears unchanged and well-formatted, despite recent cache clearing...",
+  "scope": "Official Antigravity CLI interactive session action summary + patch/artifact provenance check."
+}

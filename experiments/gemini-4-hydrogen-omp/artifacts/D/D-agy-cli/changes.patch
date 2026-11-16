@@ -1,0 +1,231 @@
+--- a/src/_pytest/unittest.py
++++ b/src/_pytest/unittest.py
+@@ -121,10 +121,39 @@
+             self._request._fillfixtures()
+ 
+     def teardown(self):
+-        if self._needs_explicit_tearDown:
++        try:
++            if self._needs_explicit_tearDown:
++                self._needs_explicit_tearDown = False
++                self._teardown_testcase()
++        finally:
++            self._testcase = None
++            self._obj = None
++
++    def _teardown_testcase(self) -> None:
++        """Run tearDown() and doCleanups() when TestCase.run() was aborted early."""
++        tear_down_failed = False
++        try:
+             self._testcase.tearDown()
+-        self._testcase = None
+-        self._obj = None
++        except BaseException:
++            tear_down_failed = True
++            raise
++        finally:
++            self._run_testcase_cleanups(record_errors=not tear_down_failed)
++
++    def _run_testcase_cleanups(self, record_errors: bool) -> None:
++        """Execute pending TestCase cleanups, recording errors via _Outcome when available."""
++        if record_errors and hasattr(self._testcase, "_outcome"):
++            import unittest.case
++
++            outcome_cls = getattr(unittest.case, "_Outcome", None)
++            if outcome_cls is not None and self._testcase._outcome is None:
++                self._testcase._outcome = outcome_cls(self)
++                try:
++                    self._testcase.doCleanups()
++                finally:
++                    self._testcase._outcome = None
++                return
++        self._testcase.doCleanups()
+ 
+     def startTest(self, testcase):
+         pass
+@@ -195,6 +224,9 @@
+     def stopTest(self, testcase):
+         pass
+ 
++    def addDuration(self, testcase, elapsed):
++        pass
++
+     def _expecting_failure(self, test_method) -> bool:
+         """Return True if the given unittest method (or the entire class) is marked
+         with @expectedFailure"""
+--- a/testing/test_unittest.py
++++ b/testing/test_unittest.py
+@@ -1146,3 +1146,173 @@
+     testdir.copy_example("unittest/test_unittest_asynctest.py")
+     reprec = testdir.inline_run()
+     reprec.assertoutcome(failed=1, passed=2)
++
++
++def test_cleanup_on_failure(testdir):
++    testpath = testdir.makepyfile(
++        """
++        import unittest
++
++        events = []
++
++        class TC(unittest.TestCase):
++            def setUp(self):
++                self.addCleanup(events.append, "setup_1")
++                self.addCleanup(events.append, "setup_2")
++
++            def tearDown(self):
++                events.append("tearDown")
++                self.addCleanup(events.append, "teardown_cleanup")
++
++            def test_pass(self):
++                self.addCleanup(events.append, "pass_cleanup")
++
++            def test_fail(self):
++                self.addCleanup(events.append, "fail_cleanup_1")
++                self.addCleanup(events.append, "fail_cleanup_2")
++                assert False, "intentional"
++
++        class TCWithFailingTearDown(unittest.TestCase):
++            def tearDown(self):
++                events.append("failing_tearDown")
++                raise RuntimeError("td error")
++
++            def test_fail_both(self):
++                self.addCleanup(events.append, "after_failing_td")
++                assert False, "intentional"
++
++        def test_verify():
++            assert events == [
++                "tearDown",
++                "teardown_cleanup",
++                "fail_cleanup_2",
++                "fail_cleanup_1",
++                "setup_2",
++                "setup_1",
++                "tearDown",
++                "teardown_cleanup",
++                "pass_cleanup",
++                "setup_2",
++                "setup_1",
++                "failing_tearDown",
++                "after_failing_td",
++            ]
++        """
++    )
++    reprec = testdir.inline_run(testpath)
++    passed, skipped, failed = reprec.countoutcomes()
++    assert passed == 2
++    assert skipped == 0
++    # test_fail (call), test_fail_both (call + teardown error)
++    assert failed == 3
++
++
++def test_cleanup_failure_on_failing_test(testdir):
++    testpath = testdir.makepyfile(
++        """
++        import unittest
++
++        cleanups = []
++
++        class TC(unittest.TestCase):
++            def test_fail_and_bad_cleanup(self):
++                self.addCleanup(cleanups.append, "first")
++                self.addCleanup(lambda: 1 / 0)
++                self.addCleanup(cleanups.append, "last")
++                assert False, "test failure"
++
++        def test_verify_remaining_cleanups():
++            assert cleanups == ["last", "first"]
++        """
++    )
++    result = testdir.runpytest(testpath)
++    assert result.ret == 1
++    result.stdout.fnmatch_lines(
++        [
++            "*ERROR at teardown of TC.test_fail_and_bad_cleanup*",
++            "*ZeroDivisionError*",
++            "*1 failed, 1 passed, 1 error*",
++        ]
++    )
++
++
++def test_cleanup_with_skip(testdir):
++    testpath = testdir.makepyfile(
++        """
++        import pytest
++        import unittest
++
++        events = []
++
++        class TC(unittest.TestCase):
++            def tearDown(self):
++                events.append("tearDown")
++
++            @unittest.skip("decorator skip")
++            def test_1_decorator_skip(self):
++                self.addCleanup(events.append, "should_not_run")
++
++            def test_2_skipTest(self):
++                self.addCleanup(events.append, "skipTest_cleanup")
++                self.skipTest("imperative unittest skip")
++
++            def test_3_pytest_skip(self):
++                self.addCleanup(events.append, "pytest_skip_cleanup")
++                pytest.skip("imperative pytest skip")
++
++        class TCSkipInSetUp(unittest.TestCase):
++            def setUp(self):
++                self.addCleanup(events.append, "setup_skip_cleanup")
++                self.skipTest("skip in setUp")
++
++            def tearDown(self):
++                events.append("should_not_run_tearDown")
++
++            def test_4_never_runs(self):
++                events.append("should_not_run_test")
++
++        def test_5_verify():
++            assert events == [
++                "tearDown",
++                "skipTest_cleanup",
++                "tearDown",
++                "pytest_skip_cleanup",
++                "setup_skip_cleanup",
++            ]
++        """
++    )
++    reprec = testdir.inline_run(testpath)
++    reprec.assertoutcome(passed=1, skipped=4)
++
++
++def test_cleanup_runs_after_exception_interact(testdir):
++    testdir.makeconftest(
++        """
++        seen_during_interact = []
++
++        def pytest_exception_interact(node, call, report):
++            seen_during_interact.append((call.when, list(node.module.events)))
++        """
++    )
++    testpath = testdir.makepyfile(
++        """
++        import unittest
++
++        events = []
++
++        class TC(unittest.TestCase):
++            def tearDown(self):
++                events.append("tearDown")
++
++            def test_1_fail(self):
++                self.addCleanup(events.append, "cleanup")
++                assert False, "intentional"
++
++            def test_2_verify(self):
++                import conftest
++                assert conftest.seen_during_interact == [("call", [])]
++                assert events == ["tearDown", "cleanup"]
++        """
++    )
++    reprec = testdir.inline_run(testpath)
++    reprec.assertoutcome(passed=1, failed=1)

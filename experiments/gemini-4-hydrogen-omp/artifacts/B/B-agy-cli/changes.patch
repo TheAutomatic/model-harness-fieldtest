@@ -1,0 +1,11 @@
+--- a/requests/sessions.py
++++ b/requests/sessions.py
+@@ -180,6 +180,8 @@
+ 
+             extract_cookies_to_jar(self.cookies, prepared_request, resp.raw)
+ 
++            # Carry over the updated request for subsequent redirect hops.
++            req = prepared_request
+             i += 1
+             yield resp
+ 

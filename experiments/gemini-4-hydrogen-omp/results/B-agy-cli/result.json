@@ -1,0 +1,22 @@
+{
+  "id": "B-agy-cli",
+  "client": "antigravity-cli (official)",
+  "model": "gemini-4-hydrogen (official Antigravity channel)",
+  "cli_thought_seconds": 293,
+  "cli_thought_breakdown": "4m49s tool-loop thought + 4s final reply thought (209 tokens)",
+  "timing_scope_note": "cli_thought_seconds sums the `Thought for ...` timers displayed in official Antigravity CLI; excludes local command/tool execution time and non-thinking response/code streaming time.",
+  "exit_code": 0,
+  "prompt_sha256": "e323cf05a525420ea0f5b28f0d4c782d86637834383ee0e7bba44a5115273baa",
+  "verification": {
+    "passed": 7,
+    "total": 7,
+    "all_passed": true
+  },
+  "tool_counts": {
+    "read": 20,
+    "edit": 4,
+    "command": 16
+  },
+  "total_actions": 40,
+  "token_accounting_available": false
+}
