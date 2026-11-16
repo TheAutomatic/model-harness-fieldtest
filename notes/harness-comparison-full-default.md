@@ -61,4 +61,4 @@
 
 ---
 
-> **后续延伸阅读**：在满血 `OMP` 测试基础上，我们进一步拉通了 `Gemini 4 Hydrogen` 的 **OMP × AI Studio 反代**、**OMP × Antigravity 反代**与 **Antigravity 官方 CLI（原厂直连）**三方同台实测及流指纹鉴证（含反代封号警示、原厂摘要器模板印证及思维链配额对标），详见 **[模型与渠道实测复盘（三）：AI Studio 反代 vs Antigravity 反代 vs 官方 CLI](hydrogen-channel-forensics-and-tier-eval.md)**。
+> **后续延伸阅读**：在满血 `OMP` 测试基础上，我们进一步拉通了 `Gemini 4 Hydrogen` 的 **OMP 双反代 vs Antigravity 官方 CLI** 三方实测，并结合二进制状态机与上万轮计费日志拆解了原厂客户端的步长适配、`512K` 窗口、单步工具、短缓存 TTL 与 `/compact` 缺陷，详见 **[复盘（三）：Hydrogen 渠道指纹与三方实测](hydrogen-channel-forensics-and-tier-eval.md)** 与 **[复盘（四）：Antigravity 原厂架构与额度黑洞拆解](antigravity-architecture-and-quota-forensics.md)**。

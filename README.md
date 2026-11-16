@@ -12,8 +12,9 @@
 | [GLM-5.3（精简工具）](experiments/glm-5.3/README.md) | 智谱官方 API × OMP / Claude Code | 早期仅开放六个基础工具的两轮记录：B/C 饱和、D 拉出方案光谱；第二轮 Claude 经 pip download 读上游 |
 | [DeepSeek V4.1 Flash 1017](experiments/deepseek-v4.1-flash-1017/README.md) | OpenCode Go / 官方 API × OMP / Claude Code | 2D 鹈鹕骑车、Requests / Pytest 真实修 bug、算法题，以及测试途中踩的几个大坑 |
 
-跨实验的客户端（Harness）机制、渠道字节级鉴证与选型结论：
-- **[模型与渠道实测复盘（三）：AI Studio 反代 vs Antigravity 反代 vs 官方 CLI——Hydrogen 指纹鉴证与性能判断](notes/hydrogen-channel-forensics-and-tier-eval.md)**（最新）
+跨实验的客户端（Harness）机制、渠道字节级鉴证与原厂架构拆解：
+- **[模型与客户端深度复盘（四）：从步长适配到额度黑洞——Antigravity 原厂架构、单步工具、短缓存 TTL 与 `/compact` 硬伤](notes/antigravity-architecture-and-quota-forensics.md)**（最新）
+- **[模型与渠道实测复盘（三）：AI Studio 反代 vs Antigravity 反代 vs 官方 CLI——Hydrogen 指纹鉴证与性能判断](notes/hydrogen-channel-forensics-and-tier-eval.md)**
 - **[Harness 横向复盘（二）：满血开箱重测后的客户端终评与选型结论](notes/harness-comparison-full-default.md)**（推荐同看）
 - [Harness 横向复盘（一）：精简六工具口径下的早期账单与镜像短板](notes/harness-comparison-minimal-tools.md)
 

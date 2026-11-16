@@ -103,3 +103,4 @@
 - 结果、截图与审计：[results/](results/)
 - 独立验收脚本与说明：[evaluation/](evaluation/)
 - 跨渠道字节级鉴证与原厂对照复盘：[../../notes/hydrogen-channel-forensics-and-tier-eval.md](../../notes/hydrogen-channel-forensics-and-tier-eval.md)
+- Antigravity 原厂架构、单步工具与短缓存 TTL 额度归因拆解：[../../notes/antigravity-architecture-and-quota-forensics.md](../../notes/antigravity-architecture-and-quota-forensics.md)
