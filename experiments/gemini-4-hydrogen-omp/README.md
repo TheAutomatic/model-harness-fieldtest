@@ -48,7 +48,7 @@
 | **合计：`hydrogen`** | **13m57s** | **74** | **104** | **402.8** | **3,883.6** | **103.5** | **53.7** | **$1.67** |
 | **合计：`hydrogen-xhigh`** | **25m09s (`1.80×`)** | **112 (`1.51×`)** | **172 (`1.65×`)** | **656.3 (`1.63×`)** | **11,623.7 (`2.99×`)** | **211.7 (`2.05×`)** | **150.8 (`2.81×`)** | **$3.44 (`2.06×`)** |
 
-> ¹ 按模型计费单价（输入 `$1.50/M`、缓存读取 `$0.075/M`、含思考总输出 `$7.50/M`）由客户端逐轮实测累加。审计结果确认：8 场运行子代理派生次数全为 **`0`**（`subagent_spawns = 0`），响应模型 100% 纯净，零越界读取外网或宿主机材料（`upstream_source_read = false`）。
+> ¹ 按统一官方基准单价（输入 `$1.50/M`、缓存读取 `$0.075/M`、含思考总输出 `$7.50/M`）折算等价理论账单以衡量资源消耗倍率（`2.06×`），不代表不同渠道的实际折扣售价。审计结果确认：8 场运行子代理派生次数全为 **`0`**（`subagent_spawns = 0`），响应模型 100% 纯净，零越界读取外网或宿主机材料（`upstream_source_read = false`）。本档为单轮（`N=1`）同台对照。
 
 ---
 
@@ -78,12 +78,22 @@
 
 ### 3. B 题与 C 题：干净利落零失误
 
-- **B 题（Requests 重定向方法与鉴权状态传递）**：两边均没有掉进“只修 `method` 漏 `body` 或跨主机 `Authorization` 复活”的局部补丁陷阱，双双在 `requests/sessions.py` 循环末尾写出与上游官方一致的一行根因修复 `req = prepared_request`（[`B-hydrogen` 补丁](artifacts/B/B-hydrogen/changes.patch) · [`B-hydrogen-xhigh` 补丁](artifacts/B/B-hydrogen-xhigh/changes.patch)），全数 **`7/7`**。（注：初始工作区未预打 `ssl_match_hostname` 在 Python 3.13 下的相对导入垫片，两组在自测时均自行定位并绕过；B 题各有 1 次探查外部 Python 路径或长行读取触发扩展拦截，不影响主工作区独立解题。）
+- **B 题（Requests 重定向方法与鉴权状态传递）**：两边均没有掉进“只修 `method` 漏 `body` 或跨主机 `Authorization` 复活”的局部补丁陷阱，双双在 `requests/sessions.py` 循环末尾写出与上游官方一致的一行根因修复 `req = prepared_request`（[`B-hydrogen` 补丁](artifacts/B/B-hydrogen/changes.patch) · [`B-hydrogen-xhigh` 补丁](artifacts/B/B-hydrogen-xhigh/changes.patch)），全数 **`7/7`**。（注：初始工作区未预打 `ssl_match_hostname` 在 Python 3.13 下的相对导入垫片，两组在自测时均自行定位并绕过；两组各有 1 次探查外部依赖目录被扩展钩子正常拦截，不影响主工作区独立解题。）
 - **C 题（AtCoder 模和子数组树状数组）**：`C-hydrogen` 仅用 **4 轮、33.4 秒**（花费 `$0.05`）一把写出 1-indexed 树状数组拿下 **`41/41`**；`C-hydrogen-xhigh` 用 **6 轮、66.9 秒**同样一次全过 **`41/41`**。
 
 ---
 
-## 四、结论：`hydrogen` vs `hydrogen-xhigh`（均开 `xhigh`）怎么选？
+## 四、底层渠道鉴证摘要：同一个模型底座，差在“旁路摘要器”与“思考档位闸门”
+
+两边的思维链文风肉眼差异极大（`hydrogen` 为带粗体小标题的第一人称口语，`hydrogen-xhigh` 为标记 `summary: true` 的第三人称冷静工程笔记），容易引发“不同渠道是否部署了满血/残血两套模型”的疑问。对全部 8 场 `stdout.jsonl` 做字节级拆解后结论明确（完整证据链见 **[模型与渠道裁判复盘（三）](../../notes/hydrogen-channel-forensics-and-tier-eval.md)**）：
+
+1. **加密签名包头实锤底座 100% 同源**：两边回传的跨轮隐状态签名 `thought_signature` 解码后，内层密文统一以完全相同的 5 字节 Google Tink AEAD 密钥头（`01 69 14 7d 13`，Base64 前缀 `AWkUfR...`）打头，证实出自同一权重推理池，且跨轮签名完整透传无失忆。
+2. **人称差异来自下游“旁路思维摘要器”，不影响模型智商**：8 场可见 `thinking` 字符数 ÷ `reasoningTokens` 仅 `0.91 ~ 1.78 chars/tok`（远低于英文原文的 `~4 chars/tok`，`A-hydrogen-xhigh` 单轮加密签名块达 `45.1 KB`）。展示给前端的分别是 AI Studio 风格与 AGY 风格的两套旁路摘要文本，主模型生成代码与回答只看内部原生隐式推理链，人称模板对输出质量几乎零影响。
+3. **真实开销级差来自思考预算映射**：`/v1` OpenAI 兼容层的 `effort: xhigh` 实际落在了标准 `high` 档（四题总思考 `53.7k` tok），而 `/v1beta` 的 `hydrogen-xhigh` 推开了顶格预算闸门（总思考 `150.8k` tok，`2.81×`）；同时本套客观题对 Hydrogen 梯队已触及满分天花板，单轮（`N=1`）测试主要验证了通路真伪、多模态浏览器闭环与预算倍率。
+
+---
+
+## 五、结论：`hydrogen` vs `hydrogen-xhigh`（均开 `xhigh`）怎么选？
 
 把一轮四题的成品质量、客观题满分率与账单摆在一起，结论非常明朗：
 
@@ -98,3 +108,4 @@
 - 交付物与补丁：[A 鹈鹕 HTML](artifacts/A/) · [B Requests 补丁](artifacts/B/) · [C 算法源码](artifacts/C/) · [D Pytest 补丁](artifacts/D/)
 - 结果、截图与审计：[results/](results/)
 - 独立验收脚本与说明：[evaluation/](evaluation/)
+- 跨渠道字节级鉴证与跨模型代差裁判复盘：[../../notes/hydrogen-channel-forensics-and-tier-eval.md](../../notes/hydrogen-channel-forensics-and-tier-eval.md)
