@@ -61,4 +61,4 @@
 
 ---
 
-> **后续延伸阅读**：在固定使用满血 `OMP` 客户端后，我们进一步对 `Gemini 4 Hydrogen` 两条不同协议/上游管线进行了单轮实测与字节级流日志拆解（验证 `thought_signature` 同源性、旁路摘要器滤镜及多模态浏览器闭环代差），详见 **[模型与渠道裁判复盘（三）：Hydrogen 双链路字节级验真、摘要器滤镜与跨模型代差](hydrogen-channel-forensics-and-tier-eval.md)**。
+> **后续延伸阅读**：在固定使用满血 `OMP` 客户端后，我们进一步对 `Gemini 4 Hydrogen` 的 **AI Studio 反代渠道**与 **Antigravity 反代渠道**进行了单轮实测与字节级流指纹鉴证（含反代封号风险警示、Tink 签名同源验证及思维链配额对比），详见 **[模型与渠道实测复盘（三）：AI Studio 反代 vs Antigravity 反代](hydrogen-channel-forensics-and-tier-eval.md)**。

@@ -1,8 +1,8 @@
 {
-  "title": "Gemini 4 Hydrogen vs Hydrogen-xHigh — single-round OMP full-harness field test (thinking=xhigh)",
+  "title": "Gemini 4 Hydrogen — AI Studio reverse-proxy vs Antigravity reverse-proxy single-round OMP full-harness field test (thinking=xhigh)",
   "models": {
-    "hydrogen": "gemini-4-hydrogen (openai-completions /v1, thinking=xhigh)",
-    "hydrogen-xhigh": "gemini-4-hydrogen-xhigh (google-generative-ai /v1beta, thinking=xhigh)"
+    "hydrogen": "gemini-4-hydrogen (AI Studio reverse-proxy channel via openai-completions /v1, thinking=xhigh)",
+    "hydrogen-xhigh": "gemini-4-hydrogen-xhigh (Antigravity reverse-proxy channel via google-generative-ai /v1beta, thinking=xhigh)"
   },
   "client": "OMP 18.20.2 (full default harness)",
   "rounds": [
