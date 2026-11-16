@@ -1,16 +1,21 @@
 {
-  "title": "Gemini 4 Hydrogen — AI Studio reverse-proxy vs Antigravity reverse-proxy single-round OMP full-harness field test (thinking=xhigh)",
+  "title": "Gemini 4 Hydrogen — OMP (AI Studio reverse-proxy vs Antigravity reverse-proxy) vs Official Antigravity CLI single-round field test",
   "models": {
-    "hydrogen": "gemini-4-hydrogen (AI Studio reverse-proxy channel via openai-completions /v1, thinking=xhigh)",
-    "hydrogen-xhigh": "gemini-4-hydrogen-xhigh (Antigravity reverse-proxy channel via google-generative-ai /v1beta, thinking=xhigh)"
+    "hydrogen": "gemini-4-hydrogen (AI Studio reverse-proxy channel via openai-completions /v1 in OMP 18.20.2, thinking=xhigh)",
+    "hydrogen-xhigh": "gemini-4-hydrogen-xhigh (Antigravity reverse-proxy channel via google-generative-ai /v1beta in OMP 18.20.2, thinking=xhigh)",
+    "agy-cli": "gemini-4-hydrogen (Official Antigravity CLI direct channel, default top thinking)"
   },
-  "client": "OMP 18.20.2 (full default harness)",
+  "clients": [
+    "OMP 18.20.2 (full default harness)",
+    "Antigravity CLI (official native CLI)"
+  ],
   "rounds": [
     "single-round"
   ],
   "protocols": {
     "hydrogen": "openai-completions",
-    "hydrogen-xhigh": "google-generative-ai"
+    "hydrogen-xhigh": "google-generative-ai",
+    "agy-cli": "official-antigravity-native"
   },
   "python": "3.13.14",
   "thinking_requested": "xhigh",
@@ -21,7 +26,7 @@
     "D"
   ],
   "attempts_per_task_per_model": 1,
-  "order": "Strict sequential A -> B -> C -> D; hydrogen and hydrogen-xhigh paired per task with zero cross-task overlap",
+  "order": "Strict sequential A -> B -> C -> D; OMP runs paired per task with zero cross-task overlap, followed by sequential A -> B -> C -> D in official Antigravity CLI across isolated standalone folders",
   "wall_limit": 2700,
   "harness_policy": {
     "built_in_tools": "All default OMP built-in tools enabled (no --tools whitelist, no --no-lsp, no --no-prewalk, no --no-pty)",

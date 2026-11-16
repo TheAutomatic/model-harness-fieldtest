@@ -6,14 +6,14 @@
 
 | 实验记录 | 对比组合 | 看点 |
 |---|---|---|
-| [Gemini 4 Hydrogen 双反代渠道（OMP 满血开箱）](experiments/gemini-4-hydrogen-omp/README.md) | AI Studio 反代 vs Antigravity 反代（同设 `xhigh`）× OMP `18.20.2` | 客观题双双 `7/7 + 41/41 + 11/11` 触顶；模型指纹确认两渠道未部署异模，AI Studio `xhigh` 思维量约等效 Antigravity `high`（附 Ultra 5x 封号警示） |
+| [Gemini 4 Hydrogen 三方对照（OMP 双反代 vs 官方 CLI）](experiments/gemini-4-hydrogen-omp/README.md) | AI Studio 反代 / Antigravity 反代（OMP）vs **Antigravity 官方 CLI** | 三方客观题全数 `7/7 + 41/41 + 11/11` 大满贯；原厂 CLI 印证摘要器模板与模型指纹同源，AI Studio `xhigh` 思考量约等效 Antigravity `high`（附 Ultra 5x 封号警示） |
 | [GLM-5.3（满血开箱）](experiments/glm-5.3-full-harness/README.md) | 智谱官方 API × OMP / Claude Code | 放开客户端默认全套工具重跑两轮：子代理 0 触发，OMP 主动调内置浏览器自检，Token 账单 Claude 约 1.44×；抓到 `read(URL)` 旁路并独立补测 |
 | [GLM-5.3-Flash（精简工具）](experiments/glm-5.3-flash/README.md) | 智谱官方 API × OMP / Claude Code | 同题两轮重跑：方差大过客户端差异；B 有“只修方法不修根因”的样本，D 两组独立写出 11/11、一组早调清理掉到 7/11 |
 | [GLM-5.3（精简工具）](experiments/glm-5.3/README.md) | 智谱官方 API × OMP / Claude Code | 早期仅开放六个基础工具的两轮记录：B/C 饱和、D 拉出方案光谱；第二轮 Claude 经 pip download 读上游 |
 | [DeepSeek V4.1 Flash 1017](experiments/deepseek-v4.1-flash-1017/README.md) | OpenCode Go / 官方 API × OMP / Claude Code | 2D 鹈鹕骑车、Requests / Pytest 真实修 bug、算法题，以及测试途中踩的几个大坑 |
 
 跨实验的客户端（Harness）机制、渠道字节级鉴证与选型结论：
-- **[模型与渠道实测复盘（三）：AI Studio 反代 vs Antigravity 反代——Hydrogen 模型指纹鉴证、文风滤镜与性能判断](notes/hydrogen-channel-forensics-and-tier-eval.md)**（最新）
+- **[模型与渠道实测复盘（三）：AI Studio 反代 vs Antigravity 反代 vs 官方 CLI——Hydrogen 指纹鉴证与性能判断](notes/hydrogen-channel-forensics-and-tier-eval.md)**（最新）
 - **[Harness 横向复盘（二）：满血开箱重测后的客户端终评与选型结论](notes/harness-comparison-full-default.md)**（推荐同看）
 - [Harness 横向复盘（一）：精简六工具口径下的早期账单与镜像短板](notes/harness-comparison-minimal-tools.md)
 
